@@ -1,0 +1,27 @@
+.typewriter-container {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+}
+
+.typewriter-text {
+  font-weight: inherit;
+  color: inherit;
+}
+
+.typewriter-cursor {
+  font-weight: 300;
+  color: var(--accent);
+  margin-left: 2px;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  from, to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}

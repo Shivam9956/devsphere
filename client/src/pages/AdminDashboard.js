@@ -5,7 +5,7 @@ import { iconGroups, getIcon } from '../utils/iconMap';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
 
-const tabs = ['Projects', 'Services', 'Earnings', 'Client Projects', 'Messages', 'Testimonials', 'Blog', 'Newsletter', 'Support Tickets', 'Pricing'];
+const tabs = ['Projects', 'Services', 'Earnings', 'Client Projects', 'Clients', 'Messages', 'Testimonials', 'Blog', 'Newsletter', 'Support Tickets', 'Pricing'];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('Projects');
@@ -803,6 +803,51 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+        {/* Clients Tab */}
+        {activeTab === 'Clients' && (
+          <div>
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Registered Clients ({clients.length})</h3>
+            </div>
+            
+            <div style={{ overflowX: 'auto', background: 'var(--card)', borderRadius: '12px', border: '1px solid var(--border)', padding: '12px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text2)', fontWeight: 600 }}>
+                    <th style={{ padding: '12px 16px' }}>Name</th>
+                    <th style={{ padding: '12px 16px' }}>Email</th>
+                    <th style={{ padding: '12px 16px' }}>Company</th>
+                    <th style={{ padding: '12px 16px' }}>Phone</th>
+                    <th style={{ padding: '12px 16px' }}>Country</th>
+                    <th style={{ padding: '12px 16px' }}>Joined Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clients.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: 'center', padding: '24px', color: 'var(--text2)' }}>
+                        No clients registered yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    clients.map((c) => (
+                      <tr key={c._id} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }}>
+                        <td style={{ padding: '12px 16px', fontWeight: 600 }}>{c.name}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--text)' }}>{c.email}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--text2)' }}>{c.company || '—'}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--text2)' }}>{c.phone || '—'}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--text2)' }}>{c.country || '—'}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--text3)', fontSize: '0.82rem' }}>
+                          {new Date(c.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

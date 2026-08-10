@@ -7,7 +7,7 @@ const socials = [
   { icon: <FaGithub />, href: 'https://github.com/Shivam9956', label: 'GitHub' },
   { icon: <FaLinkedin />, href: 'https://www.linkedin.com/in/shivam-maurya-023788305', label: 'LinkedIn' },
   { icon: <FaTwitter />, href: 'https://x.com/DevSphereGloble', label: 'Twitter' },
-  { icon: <FaInstagram />, href: 'https://www.instagram.com/invites/contact/?utm_source=ig_contact_invite&utm_medium=copy_link&utm_content=h5divp5', label: 'Instagram' },
+  { icon: <FaInstagram />, href: 'https://www.instagram.com/devsphereglobal', label: 'Instagram' },
   { icon: <FaWhatsapp />, href: 'https://wa.me/918353949006', label: 'WhatsApp' }
 ];
 const quickLinks = [

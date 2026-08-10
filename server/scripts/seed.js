@@ -18,17 +18,17 @@ async function seed() {
   console.log('Connected to MongoDB');
 
   // 1. Seed admin user
-  // Delete existing seeded admin by email to avoid duplicates and ensure static ID
-  await User.deleteOne({ email: 'admin@devsphere.global' });
+  // Delete existing seeded admin by email or ID to avoid duplicates and ensure static ID
+  await User.deleteOne({ $or: [{ email: 'devsphereglobal@gmail.com' }, { _id: new mongoose.Types.ObjectId('6a20610ccd037bf8690215f1') }] });
   await User.create({
     _id: new mongoose.Types.ObjectId('6a20610ccd037bf8690215f1'),
     name: 'Shivam Maurya',
-    email: 'admin@devsphere.global',
-    password: 'Admin@123',
+    email: 'devsphereglobal@gmail.com',
+    password: 'Shivam@898037',
     role: 'admin',
     createdAt: new Date('2026-06-03T17:14:52.767Z')
   });
-  console.log('Admin created: admin@devsphere.global / Admin@123');
+  console.log('Admin created: devsphereglobal@gmail.com / Shivam@898037');
 
   // 2. Seed projects (Keep empty for launch)
   await Project.deleteMany({});

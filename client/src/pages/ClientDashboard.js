@@ -162,14 +162,6 @@ export default function ClientDashboard() {
         };
         const rzp = new window.Razorpay(options);
         rzp.open();
-      } else if (method === 'stripe') {
-        const res = await api.post('/payments/create-session', {
-          projectId,
-          name: user?.name,
-          email: user?.email
-        });
-        if (res.data.url) window.location.href = res.data.url;
-        else toast.error('Stripe error. Try again.');
       } else {
         toast.error('Payment method not supported');
       }
@@ -648,7 +640,6 @@ export default function ClientDashboard() {
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {[
                   { id: 'paypal', label: '🅿️ PayPal', sub: 'Worldwide' },
-                  { id: 'stripe', label: '💳 Card (Stripe)', sub: 'Worldwide' },
                   { id: 'razorpay', label: '🇮🇳 Razorpay', sub: 'India' }
                 ].map(m => (
                   <button key={m.id} onClick={() => setPayMethod(m.id)}
@@ -670,7 +661,7 @@ export default function ClientDashboard() {
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button className="btn btn-primary" onClick={() => handlePay(selectedProjectForPay._id, payMethod)}
                   disabled={payLoading} style={{ flex: 1, justifyContent: 'center' }}>
-                  {payLoading ? 'Processing...' : payMethod === 'paypal' ? '🅿️ Pay with PayPal' : payMethod === 'stripe' ? '💳 Pay with Stripe' : '🇮🇳 Pay with Razorpay'}
+                  {payLoading ? 'Processing...' : payMethod === 'paypal' ? '🅿️ Pay with PayPal' : '🇮🇳 Pay with Razorpay'}
                 </button>
                 <button className="btn btn-outline" onClick={() => setShowPayModal(false)}>Cancel</button>
               </div>

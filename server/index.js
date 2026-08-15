@@ -15,14 +15,25 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   'http://localhost:3000',
   'http://127.0.0.1:3000'
-];
+].map(url => url ? url.replace(/\/$/, '') : url);
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    // Allow local network origins dynamically (localhost, 127.0.0.1, 192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-    const isLocal = /^(https?:\/\/localhost(:\d+)?)|(https?:\/\/127\.0\.0\.1(:\d+)?)|(https?:\/\/192\.168\.\d+\.\d+(:\d+)?)|(https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?)|(https?:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?)$/.test(origin);
-    if (isLocal || allowedOrigins.includes(origin)) {
+    const cleanOrigin = origin.replace(/\/$/, '');
+    const cleanClientUrl = (process.env.CLIENT_URL || '').replace(/\/$/, '');
+
+    // Allow local network origins dynamically
+    const isLocal = /^(https?:\/\/localhost(:\d+)?)|(https?:\/\/127\.0\.0\.1(:\d+)?)|(https?:\/\/192\.168\.\d+\.\d+(:\d+)?)|(https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?)|(https?:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?)$/.test(cleanOrigin);
+    
+    // Check if origin matches CLIENT_URL (with or without www)
+    const isClientAllowed = cleanClientUrl && (
+      cleanOrigin === cleanClientUrl ||
+      cleanOrigin === cleanClientUrl.replace('://', '://www.') ||
+      cleanOrigin.replace('://www.', '://') === cleanClientUrl
+    );
+
+    if (isLocal || isClientAllowed || allowedOrigins.includes(cleanOrigin)) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'));

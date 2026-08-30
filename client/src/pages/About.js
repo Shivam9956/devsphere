@@ -91,34 +91,34 @@ export default function About() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-            <span className="badge" style={{ marginBottom: '16px', display: 'inline-block' }}>About Me</span>
+            <span className="badge" style={{ marginBottom: '16px', display: 'inline-block' }}>About Our Agency</span>
             <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800, marginBottom: '20px', lineHeight: 1.2 }}>
-              I'm <span className="gradient-text">Shivam Maurya</span>,<br />Full Stack Developer
+              We are <span className="gradient-text">DevSphere Global</span>,<br />a Web Development Agency
             </h1>
             <div className="about-meta">
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text2)', fontSize: '0.9rem' }}>
-                <FiMapPin style={{ color: 'var(--accent)' }} /> India (Remote Worldwide)
+                <FiMapPin style={{ color: 'var(--accent)' }} /> Worldwide (Remote Agency)
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text2)', fontSize: '0.9rem' }}>
-                <FiBriefcase style={{ color: 'var(--accent)' }} /> 3+ Years Experience
+                <FiBriefcase style={{ color: 'var(--accent)' }} /> 3+ Years Track Record
               </span>
             </div>
             <p style={{ color: 'var(--text2)', lineHeight: 1.8, marginBottom: '16px', fontSize: '1.05rem' }}>
-              I'm a passionate Full Stack Web Developer from India, specializing in building
+              We are a team of passionate developers, designers, and project managers specializing in building
               high-performance, scalable web applications for businesses worldwide.
             </p>
             <p style={{ color: 'var(--text2)', lineHeight: 1.8, marginBottom: '32px' }}>
-              With expertise in <strong style={{ color: 'var(--text)' }}>React.js, Node.js, MongoDB, and Python</strong>,
-              I help startups and businesses transform their ideas into powerful digital products.
-              I've worked with clients from USA, UK, Canada, Australia, and more.
+              With deep expertise in <strong style={{ color: 'var(--text)' }}>React.js, Node.js, MongoDB, and Python</strong>,
+              we help startups and enterprises transform their ideas into powerful, conversion-driven digital products.
+              We've successfully collaborated with clients from the USA, UK, Canada, Australia, and more.
             </p>
             <div className="about-actions">
               <Link to="/contact" className="btn btn-primary">
-                Hire Me <FiArrowRight />
+                Start a Project <FiArrowRight />
               </Link>
-              <a href="/Shivam%20maurya.pdf" download className="btn btn-outline">
-                <FiDownload /> Download CV
-              </a>
+              <Link to="/services" className="btn btn-outline">
+                Our Services
+              </Link>
             </div>
           </motion.div>
         </div>

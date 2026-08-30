@@ -62,7 +62,7 @@ export default function TestimonialForm() {
           >
             <div>
               <h3 style={{ fontWeight: 700, marginBottom: '6px', fontSize: '1.1rem' }}>Leave a Review</h3>
-              <p style={{ color: 'var(--text2)', fontSize: '0.88rem' }}>Share your experience working with me</p>
+              <p style={{ color: 'var(--text2)', fontSize: '0.88rem' }}>Share your experience working with us</p>
             </div>
 
             {/* Star Rating */}

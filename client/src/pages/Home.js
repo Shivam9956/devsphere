@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import CountUp from 'react-countup';
 import { FiArrowRight, FiDownload, FiCode, FiLayout, FiDatabase, FiSmartphone, FiZap, FiHeadphones, FiMail, FiMapPin, FiSend, FiClock, FiCheck, FiStar, FiShoppingCart, FiTarget, FiRefreshCw } from 'react-icons/fi';
@@ -54,6 +54,8 @@ export default function Home() {
   const [services, setServices] = useState([]);
   const [statsRef, statsInView] = useInView({ triggerOnce: true, threshold: 0.3 });
 
+
+
   const [contactForm, setContactForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [contactLoading, setContactLoading] = useState(false);
   const [contactSent, setContactSent] = useState(false);
@@ -98,40 +100,32 @@ export default function Home() {
             <motion.div variants={fadeUp}>
               <span className="badge">
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-                Available for Hire
+                Accepting New Projects
               </span>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="hero-title">
-              Hi, I'm{' '}
-              <span className="gradient-text">Shivam Maurya</span>
-              <br />
-              <Typewriter 
-                words={[
-                  'Full Stack Developer',
-                  'Freelance Developer'
-                ]} 
-                typingSpeed={80} 
-                deletingSpeed={40} 
-                delayBetween={2500} 
-              />
-              <br />
-              <span style={{ fontSize: '0.55em', color: 'var(--text2)', fontWeight: 500, letterSpacing: '-0.01em' }}>
-                @ DevSphere Global
+            <h1 className="hero-title" style={{ display: 'block' }}>
+              <span className="hero-title-line-1">
+                We Build <span className="gradient-text gradient-shine">Digital</span>
               </span>
-            </motion.h1>
+              <span className="hero-title-line-2">
+                Experiences That
+              </span>
+              <span className="hero-title-line-3">
+                <span className="gradient-text gradient-shine">Grow</span> Businesses
+              </span>
+            </h1>
 
             <motion.p variants={fadeUp} className="hero-subtitle">
-              Building high-performance websites and web applications for global clients.
-              From USA to UK, Canada to Australia — delivering world-class digital solutions.
+              DevSphere Global helps businesses, startups, and entrepreneurs build modern, fast, and scalable websites and web applications that grow their online presence.
             </motion.p>
 
             <motion.div variants={fadeUp} className="hero-cta">
               <Link to="/contact" className="btn btn-primary">
-                Hire Me <FiArrowRight size={16} />
+                Get a Free Quote <FiArrowRight size={16} />
               </Link>
               <Link to="/projects" className="btn btn-outline">
-                View Projects
+                View Our Projects
               </Link>
             </motion.div>
 
@@ -155,18 +149,13 @@ export default function Home() {
               <div className="code-window">
                 <div className="code-dots">
                   <span /><span /><span />
-                  <span style={{ marginLeft: 'auto', color: 'var(--text3)', fontSize: '0.75rem' }}>developer.js</span>
                 </div>
                 <pre className="code-content">
                   <span className="code-comment">{'// DevSphere Global'}</span>{'\n'}
-                  <span className="code-key">const</span>{' developer = {\n'}
-                  {'  '}<span className="code-key">name</span>{': '}<span className="code-str">"Shivam Maurya"</span>{',\n'}
-                  {'  '}<span className="code-key">role</span>{': '}<span className="code-str">"Full Stack Dev"</span>{',\n'}
+                  <span className="code-key">const</span>{' agency = {\n'}
+                  {'  '}<span className="code-key">founder</span>{': '}<span className="code-str">"Shivam Maurya"</span>{',\n'}
                   {'  '}<span className="code-key">agency</span>{': '}<span className="code-str">"DevSphere Global"</span>{',\n'}
-                  {'  '}<span className="code-key">skills</span>{': ['}<span className="code-str">"React"</span>{', '}<span className="code-str">"Node"</span>{',\n'}
-                  {'           '}<span className="code-str">"MongoDB"</span>{'],\n'}
-                  {'  '}<span className="code-key">available</span>{': '}<span className="code-bool">true</span>{',\n'}
-                  {'  '}<span className="code-key">experience</span>{': '}<span className="code-num">3</span>{' + '}<span className="code-str">" years"</span>{',\n'}
+                  {'  '}<span className="code-key">specialization</span>{': '}<span className="code-str">"Full Stack Development"</span>{',\n'}
                   {'  '}<span className="code-key">clients</span>{': '}<span className="code-str">"Worldwide 🌍"</span>{'\n'}
                   {'};'}
                 </pre>
@@ -220,24 +209,23 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-            >              <div className="section-tag">About Me</div>
+            >
+              <div className="section-tag">About Our Agency</div>
               <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', marginBottom: '20px' }}>
-                Passionate developer with a{' '}
+                Empowering businesses with a{' '}
                 <span className="gradient-text">global mindset</span>
               </h2>
               <p style={{ color: 'var(--text2)', lineHeight: 1.85, marginBottom: '16px', fontSize: '0.97rem' }}>
-                I'm Shivam Maurya, a Full Stack Web Developer from India with 3+ years of experience building
+                We are DevSphere Global, a web development agency with a track record of building high-performance,
                 scalable web applications for clients across USA, UK, Canada, and Australia.
               </p>
               <p style={{ color: 'var(--text2)', lineHeight: 1.85, marginBottom: '36px', fontSize: '0.97rem' }}>
-                I specialize in React.js, Node.js, and MongoDB — delivering clean code, modern UI/UX,
-                and high-performance solutions that help businesses grow online.
+                We specialize in React.js, Node.js, Next.js, and MongoDB — delivering clean code, modern UI/UX,
+                and conversion-focused solutions that help businesses scale online.
               </p>
               <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-                <Link to="/contact" className="btn btn-primary">Let's Work Together</Link>
-                <a href="/Shivam%20maurya.pdf" className="btn btn-outline" download>
-                  <FiDownload size={15} /> Download CV
-                </a>
+                <Link to="/contact" className="btn btn-primary">Start a Project</Link>
+                <Link to="/services" className="btn btn-outline">Our Services</Link>
               </div>
             </motion.div>
 
@@ -282,7 +270,7 @@ export default function Home() {
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
               <div className="section-tag" style={{ display: 'inline-flex' }}>What I Do</div>
             </div>
-            <h2 className="section-title">Services I Offer</h2>
+            <h2 className="section-title">Services We Offer</h2>
             <p className="section-subtitle">End-to-end web development solutions for your business</p>
           </motion.div>
 
@@ -299,6 +287,43 @@ export default function Home() {
                 <div className="service-icon">{s.icon && typeof s.icon === 'string' ? getIcon(s.icon) : (s.icon || getIcon('FiCode'))}</div>
                 <h3 style={{ marginBottom: '10px', fontWeight: 700, fontSize: '1rem' }}>{s.title}</h3>
                 <p style={{ color: 'var(--text2)', fontSize: '0.88rem', lineHeight: 1.7 }}>{s.desc || s.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Our Process ── */}
+      <section className="section" style={{ background: 'var(--bg)' }}>
+        <div className="container">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+              <div className="section-tag" style={{ display: 'inline-flex' }}>Workflow</div>
+            </div>
+            <h2 className="section-title">Our Development Process</h2>
+            <p className="section-subtitle">How we take your project from concept to a successful launch</p>
+          </motion.div>
+
+          <div className="process-timeline">
+            {[
+              { step: '01', title: 'Discovery & Strategy', desc: 'We discuss your goals, define requirement specs, estimate project budget, and create a solid project roadmap.', color: '#6366f1' },
+              { step: '02', title: 'UX/UI Prototyping', desc: 'Our designers build custom wireframes and interactive mockups, giving you a detailed visual prototype of the final product.', color: '#8b5cf6' },
+              { step: '03', title: 'Agile Development', desc: 'Our developers build your project using clean code and modern frameworks, ensuring full speed optimization and regular updates.', color: '#06b6d4' },
+              { step: '04', title: 'Quality Assurance & Launch', desc: 'We run end-to-end testing for responsive design, security, and performance before deploying to production.', color: '#10b981' }
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                className="process-step"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.6 }}
+              >
+                <div className="process-icon-wrap" style={{ '--accent-color': item.color }}>
+                  <span className="process-step-num">{item.step}</span>
+                </div>
+                <h3 className="process-step-title">{item.title}</h3>
+                <p className="process-step-desc">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -336,14 +361,15 @@ export default function Home() {
       )}
 
       {/* ── Testimonials ── */}
-      {testimonials.length > 0 && (
-        <section className="section" style={{ background: 'var(--bg2)' }}>
-          <div className="container">
-            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-              <div className="section-tag" style={{ display: 'inline-flex' }}>Reviews</div>
-            </div>
-            <h2 className="section-title">Client Testimonials</h2>
-            <p className="section-subtitle">What my clients say about working with me</p>
+      <section className="section" style={{ background: 'var(--bg2)' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+            <div className="section-tag" style={{ display: 'inline-flex' }}>Reviews</div>
+          </div>
+          <h2 className="section-title">Client Testimonials</h2>
+          <p className="section-subtitle">What our clients say about working with us</p>
+          
+          {testimonials.length > 0 ? (
             <div className="grid-3">
               {testimonials.map((t, i) => (
                 <motion.div key={t._id}
@@ -356,18 +382,29 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
-
-            {/* Testimonial Form */}
-            <div style={{ marginTop: '64px' }}>
-              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px' }}>Share Your Experience</h3>
-                <p style={{ color: 'var(--text2)', fontSize: '0.95rem' }}>Worked with me? I'd love to hear your feedback.</p>
-              </div>
-              <TestimonialForm />
+          ) : (
+            <div className="card" style={{ 
+              textAlign: 'center', 
+              padding: '40px 20px', 
+              maxWidth: '600px',
+              margin: '0 auto 40px auto',
+              border: '1px dashed var(--border)'
+            }}>
+              <p style={{ fontStyle: 'italic', marginBottom: '8px', fontSize: '1.1rem', color: 'var(--text1)' }}>No reviews yet.</p>
+              <p style={{ fontSize: '0.95rem', color: 'var(--text2)' }}>Be the first to share your experience working with us below!</p>
             </div>
+          )}
+
+          {/* Testimonial Form */}
+          <div style={{ marginTop: '64px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px' }}>Share Your Experience</h3>
+              <p style={{ color: 'var(--text2)', fontSize: '0.95rem' }}>Worked with us? We'd love to hear your feedback.</p>
+            </div>
+            <TestimonialForm />
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* ── Why Choose Me ── */}
       <section className="section" style={{ background: 'var(--bg)' }}>
@@ -406,6 +443,47 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Client Portal Promotion ── */}
+      <section className="section" style={{ background: 'var(--bg2)' }}>
+        <div className="container">
+          <div className="client-portal-promo-card">
+            <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)', filter: 'blur(30px)', pointerEvents: 'none' }} />
+            
+            <div>
+              <div className="section-tag" style={{ marginBottom: '16px' }}>Interactive Portal</div>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', fontWeight: 800, marginBottom: '18px', lineHeight: 1.2 }}>
+                Manage Your Project Through Our <span className="gradient-text">Client Portal</span>
+              </h2>
+              <p style={{ color: 'var(--text2)', lineHeight: 1.8, marginBottom: '28px', fontSize: '0.95rem' }}>
+                We believe in complete transparency. Our custom client dashboard lets you check project milestones, download invoices, calculate price estimates, and raise support tickets in real-time.
+              </p>
+              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                <Link to="/login" className="btn btn-primary">Log In to Portal</Link>
+                <Link to="/cost-estimator" className="btn btn-outline">Estimate Project Cost</Link>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {[
+                { title: 'Milestone Tracking', desc: 'Track your project development step-by-step from your dashboard.' },
+                { title: 'Billing & Invoices', desc: 'Securely pay milestones, download invoices, and manage payment receipts.' },
+                { title: 'Instant Cost Estimator', desc: 'Plan your budget instantly using our interactive calculator.' }
+              ].map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(99,102,241,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0, marginTop: '2px' }}>
+                    {idx + 1}
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '4px', color: 'var(--text)' }}>{item.title}</h4>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text2)', lineHeight: 1.5 }}>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Contact Section ── */}
       <section className="section" style={{ background: 'var(--bg)' }}>
         <div className="container">
@@ -420,7 +498,7 @@ export default function Home() {
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
               <h3 style={{ fontSize: '1.4rem', marginBottom: '14px', fontWeight: 700 }}>Let's work together</h3>
               <p style={{ color: 'var(--text2)', lineHeight: 1.85, marginBottom: '36px', fontSize: '0.95rem' }}>
-                I'm available for freelance projects worldwide. Whether you need a simple website or a complex web application, I'm here to help.
+                We are available for new projects worldwide. Whether you need a simple website, an e-commerce store, or a complex web application, our agency is here to help.
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '36px' }}>

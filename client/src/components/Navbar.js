@@ -57,19 +57,22 @@ export default function Navbar() {
 
           {user ? (
             <div className="nav-user">
-              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-                <FiUser size={14} style={{ marginRight: '6px' }} /> 
-                <span>{user.role === 'admin' ? 'Admin Panel' : 'Dashboard'} ({(user.name || 'User').split(' ')[0]})</span>
+              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="icon-btn" title={user.role === 'admin' ? 'Admin Panel' : 'Dashboard'} aria-label="Dashboard">
+                <FiUser size={16} />
               </Link>
-              <button className="icon-btn" onClick={handleLogout} aria-label="Logout">
+              <button className="icon-btn" onClick={handleLogout} title="Logout" aria-label="Logout">
                 <FiLogOut />
               </button>
             </div>
           ) : (
-            <Link to="/login" className="btn btn-primary" style={{ padding: '10px 22px' }}>
-              Client Login
+            <Link to="/login" className="icon-btn" title="Client Login" aria-label="Login">
+              <FiUser size={16} />
             </Link>
           )}
+
+          <Link to="/contact" className="btn btn-primary" style={{ padding: '10px 22px', fontSize: '0.9rem' }}>
+            Start a Project
+          </Link>
 
           <button className="icon-btn mobile-menu-btn" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
             {menuOpen ? <FiX /> : <FiMenu />}

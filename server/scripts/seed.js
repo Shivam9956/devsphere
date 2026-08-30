@@ -42,43 +42,8 @@ async function seed() {
     '6a20610ccd037bf8690215f7'
   ];
   await Testimonial.deleteMany({ _id: { $in: testimonialIds.map(id => new mongoose.Types.ObjectId(id)) } });
+  console.log('Cleared sample testimonials');
 
-  await Testimonial.insertMany([
-    {
-      _id: new mongoose.Types.ObjectId('6a20610ccd037bf8690215f5'),
-      name: 'John Smith',
-      role: 'CEO',
-      company: 'TechCorp',
-      country: 'USA',
-      rating: 5,
-      message: 'Shivam delivered an exceptional website that exceeded our expectations. Professional, fast, and highly skilled.',
-      approved: true,
-      createdAt: new Date('2026-06-03T17:14:52.771Z')
-    },
-    {
-      _id: new mongoose.Types.ObjectId('6a20610ccd037bf8690215f6'),
-      name: 'Sarah Johnson',
-      role: 'Founder',
-      company: 'StartupXYZ',
-      country: 'UK',
-      rating: 5,
-      message: 'Outstanding work! The e-commerce platform he built for us increased our sales by 40%. Highly recommended.',
-      approved: true,
-      createdAt: new Date('2026-06-03T17:14:52.772Z')
-    },
-    {
-      _id: new mongoose.Types.ObjectId('6a20610ccd037bf8690215f7'),
-      name: 'Mike Chen',
-      role: 'CTO',
-      company: 'DevAgency',
-      country: 'Canada',
-      rating: 5,
-      message: 'Best developer I\'ve worked with. Clean code, great communication, and delivered on time.',
-      approved: true,
-      createdAt: new Date('2026-06-03T17:14:52.773Z')
-    }
-  ]);
-  console.log('Sample testimonials created');
  
   // 4. Seed plans
   await Plan.deleteMany({});

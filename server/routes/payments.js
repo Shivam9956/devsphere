@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const paypal = require('@paypal/checkout-server-sdk');
 
 // ── Stripe (existing) ──────────────────────────────────────────────────────
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -31,47 +32,69 @@ const getRazorpay = () => new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// Create Razorpay order
-router.post('/razorpay/create-order', async (req, res) => {
+const createOrderHandler = async (req, res) => {
   try {
-    const { plan, currency = 'INR', projectId } = req.body;
-    let usdAmount, title, notes = {};
-
-    if (projectId) {
-      const ClientProject = require('../models/ClientProject');
-      const project = await ClientProject.findById(projectId);
-      if (!project) return res.status(404).json({ message: 'Project not found' });
-      usdAmount = project.budget;
-      title = project.title;
-      notes.projectId = projectId;
-      notes.plan = 'custom_project';
-    } else {
-      const planDoc = await Plan.findOne({ id: plan });
-      if (planDoc) {
-        usdAmount = planDoc.priceUSD;
-        title = planDoc.name;
-      } else {
-        const planData = planPrices[plan];
-        if (!planData) return res.status(400).json({ message: 'Invalid plan' });
-        usdAmount = planData.amount;
-        title = planData.name;
-      }
-      notes.plan = plan;
+    // 1. Auth check
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET ||
+        process.env.RAZORPAY_KEY_ID === 'PASTE_YOUR_RAZORPAY_KEY_ID_HERE' ||
+        process.env.RAZORPAY_KEY_SECRET === 'PASTE_YOUR_RAZORPAY_KEY_SECRET_HERE') {
+      return res.status(401).json({ message: 'Razorpay API credentials are not configured or invalid' });
     }
 
-    // Convert USD to INR (approx)
-    const inrAmount = Math.round(usdAmount * 83.5);
-    const amount = currency === 'INR' ? inrAmount : usdAmount;
+    const { amount, currency = 'INR', receipt, plan, projectId } = req.body;
+
+    let amountInPaise;
+    let title = 'Razorpay Payment';
+    let notes = {};
+
+    // Check if amount is provided directly in request body
+    if (amount !== undefined) {
+      amountInPaise = Number(amount);
+      if (isNaN(amountInPaise) || amountInPaise < 100) {
+        return res.status(400).json({ message: 'Amount must be a number and at least 100 paise' });
+      }
+      notes.type = 'direct_payment';
+    } else {
+      // Fallback to existing logic using plan or projectId
+      let usdAmount;
+      if (projectId) {
+        const ClientProject = require('../models/ClientProject');
+        const project = await ClientProject.findById(projectId);
+        if (!project) return res.status(404).json({ message: 'Project not found' });
+        usdAmount = project.budget;
+        title = project.title;
+        notes.projectId = projectId;
+        notes.plan = 'custom_project';
+      } else {
+        const planDoc = await Plan.findOne({ id: plan });
+        if (planDoc) {
+          usdAmount = planDoc.priceUSD;
+          title = planDoc.name;
+        } else {
+          const planData = planPrices[plan];
+          if (!planData) return res.status(400).json({ message: 'Invalid plan or amount' });
+          usdAmount = planData.amount;
+          title = planData.name;
+        }
+        notes.plan = plan;
+      }
+
+      // Convert USD to INR (approx)
+      const inrAmount = Math.round(usdAmount * 83.5);
+      const calculatedAmount = currency === 'INR' ? inrAmount : usdAmount;
+      amountInPaise = calculatedAmount * 100;
+    }
 
     const razorpay = getRazorpay();
     const order = await razorpay.orders.create({
-      amount: amount * 100, // paise
+      amount: amountInPaise,
       currency,
-      receipt: `receipt_${projectId || plan}_${Date.now()}`,
+      receipt: receipt || `receipt_${projectId || plan || 'direct'}_${Date.now()}`,
       notes
     });
 
     res.json({
+      order_id: order.id,
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
@@ -79,17 +102,25 @@ router.post('/razorpay/create-order', async (req, res) => {
       planName: title
     });
   } catch (err) {
-    console.error('Razorpay error:', err);
-    res.status(500).json({ message: 'Razorpay not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to .env' });
+    console.error('Razorpay order creation error:', err);
+    if (err.statusCode === 401 || (err.message && err.message.toLowerCase().includes('auth'))) {
+      return res.status(401).json({ message: 'Razorpay authentication failed' });
+    }
+    res.status(500).json({ message: err.message || 'Razorpay order creation failed' });
   }
-});
+};
 
-// Verify Razorpay payment
-router.post('/razorpay/verify', async (req, res) => {
+const verifyPaymentHandler = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, projectId, email, name } = req.body;
+
+    // Validate missing fields
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ message: 'Missing required payment verification fields (razorpay_order_id, razorpay_payment_id, razorpay_signature)' });
+    }
+
     const sign = razorpay_order_id + '|' + razorpay_payment_id;
-    const expectedSign = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET).update(sign).digest('hex');
+    const expectedSign = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '').update(sign).digest('hex');
 
     if (expectedSign === razorpay_signature) {
       const Payment = require('../models/Payment');
@@ -111,40 +142,56 @@ router.post('/razorpay/verify', async (req, res) => {
       }
 
       const user = await User.findOne({ email: (email || '').toLowerCase() });
-      await Payment.create({
-        client: user ? user._id : undefined,
-        name: name || 'Razorpay Customer',
-        email: email || 'no-email@razorpay.com',
-        plan: projectId ? 'custom_project' : 'razorpay',
-        amount: amount,
-        currency: 'usd',
-        stripeSessionId: razorpay_payment_id,
-        status: 'paid'
-      });
+      try {
+        await Payment.create({
+          client: user ? user._id : undefined,
+          name: name || 'Razorpay Customer',
+          email: email || 'no-email@razorpay.com',
+          plan: projectId ? 'custom_project' : 'razorpay',
+          amount: amount,
+          currency: 'usd',
+          stripeSessionId: razorpay_payment_id,
+          status: 'paid'
+        });
 
-      await Earning.create({
-        title: `Payment for ${title}`,
-        amount: amount,
-        currency: 'USD',
-        client: name || 'Razorpay Customer',
-        category: 'Website Development',
-        status: 'Received',
-        date: new Date(),
-        note: `Razorpay Order: ${razorpay_order_id}, Payment: ${razorpay_payment_id}`
-      });
+        await Earning.create({
+          title: `Payment for ${title}`,
+          amount: amount,
+          currency: 'USD',
+          client: name || 'Razorpay Customer',
+          category: 'Website Development',
+          status: 'Received',
+          date: new Date(),
+          note: `Razorpay Order: ${razorpay_order_id}, Payment: ${razorpay_payment_id}`
+        });
+      } catch (dbErr) {
+        console.warn('DB log skipped:', dbErr.message);
+      }
 
       res.json({ success: true, paymentId: razorpay_payment_id });
     } else {
       res.status(400).json({ success: false, message: 'Invalid signature' });
     }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Razorpay verification error:', err);
+    res.status(500).json({ message: err.message || 'Verification failed' });
   }
-});
+};
+
+router.post('/razorpay/create-order', createOrderHandler);
+router.post('/razorpay/verify', verifyPaymentHandler);
 
 // ── PayPal ─────────────────────────────────────────────────────────────────
-// Create PayPal order
-router.post('/paypal/create-order', async (req, res) => {
+const getPayPalClient = () => {
+  const clientId = process.env.PAYPAL_CLIENT_ID;
+  const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+  const environment = process.env.PAYPAL_MODE === 'live'
+    ? new paypal.core.LiveEnvironment(clientId, clientSecret)
+    : new paypal.core.SandboxEnvironment(clientId, clientSecret);
+  return new paypal.core.PayPalHttpClient(environment);
+};
+
+const paypalCreateOrderHandler = async (req, res) => {
   try {
     const { plan, projectId } = req.body;
     let usdAmount, title;
@@ -156,6 +203,7 @@ router.post('/paypal/create-order', async (req, res) => {
       usdAmount = project.budget;
       title = project.title;
     } else {
+      const Plan = require('../models/Plan');
       const planDoc = await Plan.findOne({ id: plan });
       if (planDoc) {
         usdAmount = planDoc.priceUSD;
@@ -168,97 +216,55 @@ router.post('/paypal/create-order', async (req, res) => {
       }
     }
 
-    const clientId = process.env.PAYPAL_CLIENT_ID;
-    const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
-    const base = process.env.PAYPAL_MODE === 'live'
-      ? 'https://api-m.paypal.com'
-      : 'https://api-m.sandbox.paypal.com';
-
-    // Get access token
-    const tokenRes = await fetch(`${base}/v1/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
-      },
-      body: 'grant_type=client_credentials'
-    });
-    const { access_token } = await tokenRes.json();
-
-    // Create order
-    const purchaseUnit = {
-      amount: { currency_code: 'USD', value: usdAmount.toString() },
-      description: `DevSphere Global - ${title}`
-    };
-    if (projectId) {
-      purchaseUnit.custom_id = projectId.toString();
-    }
-
-    const orderRes = await fetch(`${base}/v2/checkout/orders`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${access_token}` },
-      body: JSON.stringify({
-        intent: 'CAPTURE',
-        purchase_units: [purchaseUnit],
-        application_context: {
-          return_url: `${process.env.CLIENT_URL}/payment/success`,
-          cancel_url: `${process.env.CLIENT_URL}/payment/cancel`
-        }
-      })
-    });
-
-    const order = await orderRes.json();
-    console.log('PayPal order response:', JSON.stringify(order, null, 2));
-    const approveUrl = order.links?.find(l => l.rel === 'approve')?.href;
-    if (!approveUrl) {
-      console.error('No approve URL in PayPal response');
-      return res.status(500).json({ message: 'PayPal order creation failed: ' + (order.message || 'No approve URL') });
-    }
-    res.json({ orderId: order.id, approveUrl });
-  } catch (err) {
-    console.error('PayPal error:', err);
-    res.status(500).json({ message: 'PayPal not configured. Add PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET to .env' });
-  }
-});
-
-// Capture PayPal order
-router.post('/paypal/capture/:orderId', async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const { name, email } = req.body;
-    
-    const clientId = process.env.PAYPAL_CLIENT_ID;
-    const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
-    const base = process.env.PAYPAL_MODE === 'live'
-      ? 'https://api-m.paypal.com'
-      : 'https://api-m.sandbox.paypal.com';
-
-    // Get access token
-    const tokenRes = await fetch(`${base}/v1/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
-      },
-      body: 'grant_type=client_credentials'
-    });
-    const { access_token } = await tokenRes.json();
-
-    // Capture order
-    const captureRes = await fetch(`${base}/v2/checkout/orders/${orderId}/capture`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${access_token}`
+    const client = getPayPalClient();
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer('return=representation');
+    request.requestBody({
+      intent: 'CAPTURE',
+      purchase_units: [{
+        amount: {
+          currency_code: 'USD',
+          value: usdAmount.toString()
+        },
+        description: `DevSphere Global - ${title}`,
+        custom_id: projectId ? projectId.toString() : plan
+      }],
+      application_context: {
+        return_url: `${process.env.CLIENT_URL}/payment/success`,
+        cancel_url: `${process.env.CLIENT_URL}/payment/cancel`
       }
     });
 
-    const captureData = await captureRes.json();
-    console.log('PayPal capture response:', JSON.stringify(captureData, null, 2));
+    const response = await client.execute(request);
+    const orderId = response.result.id;
+    const approveUrl = response.result.links?.find(l => l.rel === 'approve')?.href;
+
+    res.json({ orderId, approveUrl });
+  } catch (err) {
+    console.error('PayPal create order error:', err);
+    res.status(500).json({ message: err.message || 'PayPal order creation failed' });
+  }
+};
+
+const paypalCaptureOrderHandler = async (req, res) => {
+  try {
+    const orderId = req.params.orderId || req.body.orderId || req.body.orderID;
+    const { name, email } = req.body;
+
+    if (!orderId) {
+      return res.status(400).json({ message: 'Missing orderID' });
+    }
+
+    const client = getPayPalClient();
+    const request = new paypal.orders.OrdersCaptureRequest(orderId);
+    request.requestBody({});
+
+    const response = await client.execute(request);
+    const captureData = response.result;
 
     if (captureData.status === 'COMPLETED') {
       const purchaseUnit = captureData.purchase_units?.[0];
-      const projectId = purchaseUnit?.payments?.captures?.[0]?.custom_id || purchaseUnit?.custom_id;
+      const customId = purchaseUnit?.payments?.captures?.[0]?.custom_id || purchaseUnit?.custom_id;
       const amountValue = purchaseUnit?.payments?.captures?.[0]?.amount?.value || purchaseUnit?.amount?.value;
       const payerEmail = captureData.payer?.email_address || email || '';
       const payerName = [captureData.payer?.name?.given_name, captureData.payer?.name?.surname].filter(Boolean).join(' ') || name || 'PayPal Customer';
@@ -271,6 +277,12 @@ router.post('/paypal/capture/:orderId', async (req, res) => {
       let amount = parseFloat(amountValue) || 0;
       let title = 'PayPal Custom Payment';
 
+      // Check if customId matches a project ID
+      let projectId = null;
+      if (customId && customId.match(/^[0-9a-fA-F]{24}$/)) {
+        projectId = customId;
+      }
+
       if (projectId) {
         const project = await ClientProject.findById(projectId);
         if (project) {
@@ -282,27 +294,31 @@ router.post('/paypal/capture/:orderId', async (req, res) => {
       }
 
       const user = await User.findOne({ email: payerEmail.toLowerCase() });
-      await Payment.create({
-        client: user ? user._id : undefined,
-        name: payerName,
-        email: payerEmail,
-        plan: projectId ? 'custom_project' : 'paypal',
-        amount: amount,
-        currency: 'usd',
-        stripeSessionId: orderId,
-        status: 'paid'
-      });
+      try {
+        await Payment.create({
+          client: user ? user._id : undefined,
+          name: payerName,
+          email: payerEmail,
+          plan: projectId ? 'custom_project' : (customId || 'paypal'),
+          amount: amount,
+          currency: 'usd',
+          stripeSessionId: orderId,
+          status: 'paid'
+        });
 
-      await Earning.create({
-        title: `Payment for ${title}`,
-        amount: amount,
-        currency: 'USD',
-        client: payerName,
-        category: 'Website Development',
-        status: 'Received',
-        date: new Date(),
-        note: `PayPal Order: ${orderId}`
-      });
+        await Earning.create({
+          title: `Payment for ${title}`,
+          amount: amount,
+          currency: 'USD',
+          client: payerName,
+          category: 'Website Development',
+          status: 'Received',
+          date: new Date(),
+          note: `PayPal Order: ${orderId}`
+        });
+      } catch (dbErr) {
+        console.warn('DB recording skipped/failed:', dbErr.message);
+      }
 
       res.json({ success: true, captureData });
     } else {
@@ -310,9 +326,17 @@ router.post('/paypal/capture/:orderId', async (req, res) => {
     }
   } catch (err) {
     console.error('PayPal capture error:', err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message || 'PayPal capture failed' });
   }
-});
+};
+
+router.post('/paypal/create-order', paypalCreateOrderHandler);
+router.post('/paypal/capture-order', paypalCaptureOrderHandler);
+router.post('/paypal/capture/:orderId', paypalCaptureOrderHandler);
 
 module.exports = router;
+module.exports.createOrderHandler = createOrderHandler;
+module.exports.verifyPaymentHandler = verifyPaymentHandler;
+module.exports.paypalCreateOrderHandler = paypalCreateOrderHandler;
+module.exports.paypalCaptureOrderHandler = paypalCaptureOrderHandler;
 

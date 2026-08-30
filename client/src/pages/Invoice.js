@@ -68,7 +68,7 @@ export default function Invoice() {
                 <span className="gradient-text">DevSphere</span> Global
               </div>
               <p style={{ color: 'var(--text2)', fontSize: '0.85rem', marginTop: '6px', lineHeight: 1.5 }}>
-                Freelance Development & Design<br />
+                Web Development & Design Services<br />
                 India · Available Worldwide
               </p>
             </div>

@@ -54,7 +54,7 @@ export default function Contact() {
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             <h2 style={{ fontSize: '1.4rem', marginBottom: '14px', fontWeight: 700 }}>Let's work together</h2>
             <p style={{ color: 'var(--text2)', lineHeight: 1.85, marginBottom: '36px', fontSize: '0.95rem' }}>
-              I'm available for freelance projects worldwide. Whether you need a simple website or a complex web application, I'm here to help.
+              We are available for new projects worldwide. Whether you need a simple website, an e-commerce store, or a complex web application, our agency is here to help.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '36px' }}>

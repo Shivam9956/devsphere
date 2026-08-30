@@ -19,18 +19,37 @@
   border-radius: 50%;
   filter: blur(100px);
   opacity: 0.12;
+  animation: floatOrb 16s ease-in-out infinite alternate;
 }
 
 .orb1 {
   width: 700px; height: 700px;
   background: radial-gradient(circle, #6366f1, #8b5cf6);
   top: -250px; right: -150px;
+  animation-duration: 20s;
 }
 
 .orb2 {
   width: 500px; height: 500px;
   background: radial-gradient(circle, #06b6d4, #6366f1);
   bottom: -150px; left: -150px;
+  animation-duration: 24s;
+  animation-delay: 2s;
+}
+
+@keyframes floatOrb {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translate(40px, -60px) scale(1.15);
+    opacity: 0.16;
+  }
+  100% {
+    transform: translate(-40px, 40px) scale(0.9);
+    opacity: 0.12;
+  }
 }
 
 .hero-grid {
@@ -102,6 +121,16 @@
   width: 100%;
   max-width: 420px;
   position: relative;
+  animation: floatCard 6s ease-in-out infinite alternate;
+}
+
+@keyframes floatCard {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-12px);
+  }
 }
 
 .code-window {
@@ -414,4 +443,145 @@
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+}
+
+/* Entry Animations for Hero Title Lines */
+.hero-title-line-1 {
+  display: block;
+  opacity: 0;
+  animation: fadeInUpLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-title-line-2 {
+  display: block;
+  opacity: 0;
+  animation: fadeInUpLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+
+.hero-title-line-3 {
+  display: block;
+  opacity: 0;
+  animation: fadeInUpLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+@keyframes fadeInUpLine {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Our Process Timeline ── */
+.process-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 60px;
+  position: relative;
+}
+
+.process-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.process-timeline::after {
+  content: '';
+  position: absolute;
+  top: 36px;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--border) 0%, var(--accent) 50%, var(--border) 100%);
+  z-index: 0;
+}
+
+.process-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 2px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.process-step:hover .process-icon-wrap {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 20px rgba(99,102,241,0.2);
+  transform: scale(1.05);
+}
+
+.process-step-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.process-step-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.process-step-desc {
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ── Client Portal Promo Card ── */
+.client-portal-promo-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 56px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  align-items: center;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Responsive tweaks for new sections */
+@media (max-width: 992px) {
+  .process-timeline {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+  .process-timeline::after {
+    display: none;
+  }
+  .client-portal-promo-card {
+    grid-template-columns: 1fr;
+    padding: 40px 24px;
+    gap: 36px;
+  }
+}
+
+@media (max-width: 576px) {
+  .process-timeline {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }

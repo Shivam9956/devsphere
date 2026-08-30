@@ -169,7 +169,12 @@ export default function Pricing() {
         },
         modal: { ondismiss: () => setLoadingGateway(null) }
       };
-      new window.Razorpay(options).open();
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        toast.error(response.error.description || 'Payment failed');
+        setLoadingGateway(null);
+      });
+      rzp.open();
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
       setLoadingGateway(null);
@@ -181,7 +186,7 @@ export default function Pricing() {
     if (!form.name || !form.email) return toast.error('Please fill name and email');
     setLoadingGateway('paypal');
     try {
-      const res = await api.post('/payments/paypal/create-order', {
+      const res = await api.post('/paypal/create-order', {
         plan: modal.id, name: form.name, email: form.email
       });
       if (res.data.approveUrl) {

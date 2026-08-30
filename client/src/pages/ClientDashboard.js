@@ -158,9 +158,14 @@ export default function ClientDashboard() {
             });
             toast.success('Payment successful!');
             window.location.href = '/payment/success';
-          }
+          },
+          modal: { ondismiss: () => setPayLoading(false) }
         };
         const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          toast.error(response.error.description || 'Payment failed');
+          setPayLoading(false);
+        });
         rzp.open();
       } else {
         toast.error('Payment method not supported');
@@ -672,13 +677,14 @@ export default function ClientDashboard() {
                   <PayPalButtons
                     style={{ layout: 'vertical', color: 'blue', shape: 'pill', label: 'pay' }}
                     createOrder={async () => {
-                      const res = await api.post('/payments/paypal/create-order', { projectId: selectedProjectForPay._id });
+                      const res = await api.post('/paypal/create-order', { projectId: selectedProjectForPay._id });
                       return res.data.orderId;
                     }}
                     onApprove={async (data) => {
                       setPayLoading(true);
                       try {
-                        await api.post(`/payments/paypal/capture/${data.orderID}`, {
+                        await api.post('/paypal/capture-order', {
+                          orderId: data.orderID,
                           email: user?.email,
                           name: user?.name
                         });

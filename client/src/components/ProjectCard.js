@@ -3,6 +3,22 @@ import { motion } from 'framer-motion';
 import { FiExternalLink, FiGithub } from 'react-icons/fi';
 import './ProjectCard.css';
 
+function getImpactMetric(category) {
+  switch (category) {
+    case 'E-commerce':
+      return '📈 +45% Sales';
+    case 'Web App':
+    case 'Full Stack':
+      return '⚡ 100% Speed';
+    case 'Mobile':
+      return '📱 5★ Rating';
+    case 'UI/UX':
+      return '🎨 98% Score';
+    default:
+      return '🚀 High ROI';
+  }
+}
+
 export default function ProjectCard({ project }) {
   return (
     <motion.div
@@ -37,7 +53,12 @@ export default function ProjectCard({ project }) {
 
       {/* Body */}
       <div className="project-body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div className="project-category">{project.category}</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+          <div className="project-category">{project.category}</div>
+          <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '3px 8px', borderRadius: '50px', background: 'rgba(99,102,241,0.12)', color: 'var(--accent)', border: '1px solid rgba(99,102,241,0.2)', whiteSpace: 'nowrap' }}>
+            {getImpactMetric(project.category)}
+          </span>
+        </div>
         <div className="project-title">{project.title}</div>
         <p className="project-desc">{project.description}</p>
         {project.techStack?.length > 0 && (

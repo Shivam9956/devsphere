@@ -27,6 +27,7 @@ import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import Invoice from './pages/Invoice';
 import About from './pages/About';
+import CostEstimator from './pages/CostEstimator';
 
 export const ThemeContext = createContext();
 export const AuthContext = createContext();
@@ -54,6 +55,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/cost-estimator" element={<CostEstimator />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<Contact />} />

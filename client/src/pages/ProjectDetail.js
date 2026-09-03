@@ -33,7 +33,7 @@ export default function ProjectDetail() {
   const images = project.images?.length ? project.images : (project.image ? [project.image] : []);
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
 
         {/* Back button */}
@@ -43,7 +43,7 @@ export default function ProjectDetail() {
           </Link>
         </motion.div>
 
-        <div className="project-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'start' }}>
+        <div className="project-detail-grid">
 
           {/* Left: Images */}
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>

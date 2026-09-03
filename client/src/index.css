@@ -30,6 +30,15 @@
   --radius-lg: 20px;
   --radius-xl: 28px;
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --nav-height: 104px;
+}
+
+@media (max-width: 768px) {
+  :root { --nav-height: 98px; }
+}
+
+@media (max-width: 480px) {
+  :root { --nav-height: 90px; }
 }
 
 [data-theme="light"] {
@@ -53,7 +62,11 @@
   background-image: none;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -63,6 +76,7 @@ body {
   letter-spacing: -0.011em;
   overflow-x: hidden;
   max-width: 100vw;
+  position: relative;
   transition: background 0.3s, color 0.3s;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -176,6 +190,16 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   cursor: pointer;
   letter-spacing: 0.01em;
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .btn {
+    white-space: normal !important;
+    text-align: center !important;
+    max-width: 100% !important;
+    word-break: break-word;
+    box-sizing: border-box;
+  }
 }
 
 .btn-primary {
@@ -386,125 +410,334 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   text-transform: uppercase;
 }
 
-/* ── Responsive: Contact grid ── */
+/* ── Responsive Grids & Layout Utilities ── */
+
+/* Page Wrapper for Fixed Navbar Offset */
+.page-wrapper {
+  padding-top: var(--nav-height);
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Two-column Form Row */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .form-row-2 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+/* Footer Grid */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.4fr;
+  gap: 48px;
+  margin-bottom: 48px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 36px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+}
+
+/* Pricing Grid */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 760px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 440px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Blog Grid */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .blog-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .blog-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Contact Grid */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 56px;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 36px !important;
+  }
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Audit Promo Banner Grid */
+.audit-promo-banner {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 36px;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: clamp(24px, 4vw, 48px);
+  border-radius: 24px;
+}
+
+.audit-features-box {
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (max-width: 992px) {
+  .audit-promo-banner {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .audit-promo-banner {
+    padding: 20px 14px !important;
+    border-radius: 18px !important;
+    gap: 20px !important;
+  }
+  .audit-features-box {
+    padding: 16px 12px !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .audit-promo-banner {
+    padding: 14px 10px !important;
+    border-radius: 14px !important;
+    gap: 16px !important;
+  }
+  .audit-features-box {
+    padding: 12px 8px !important;
+    gap: 10px !important;
+  }
+}
+
+/* Cost Estimator Grids */
+.estimator-layout {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 32px;
+  align-items: start;
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.estimator-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.estimator-steps-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .estimator-layout {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+}
+
 @media (max-width: 768px) {
-  .contact-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-  .pricing-grid { grid-template-columns: 1fr !important; }
-  .dashboard-grid { grid-template-columns: 1fr !important; }
+  .estimator-steps-wrapper {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .estimator-steps-wrapper::-webkit-scrollbar {
+    height: 4px;
+  }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .pricing-grid { grid-template-columns: repeat(2, 1fr) !important; }
+@media (max-width: 640px) {
+  .estimator-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
 }
 
-/* ── Responsive: 480px extras ── */
-@media (max-width: 480px) {
-  .section-title { font-size: 1.7rem; }
+/* Project Detail Grid */
+.project-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .project-detail-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+}
+
+/* About Founder Card */
+.about-founder-card {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) 1fr;
+  gap: 40px;
+  align-items: center;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .about-founder-card {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+    text-align: center;
+  }
+}
+
+/* Stages Grid in Dashboard */
+.stages-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .stages-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 540px) {
+  .stages-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Table Responsive Wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.table-responsive table {
+  min-width: 580px;
+}
+
+/* ── Global Breakpoint Tuning ── */
+@media (max-width: 1024px) {
+  .container { padding: 0 20px; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+@media (max-width: 768px) {
+  .section { padding: 52px 0; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; }
+  .container { padding: 0 16px; }
+  .section-title { font-size: clamp(1.55rem, 5vw, 1.95rem) !important; }
+  .section-subtitle { margin-bottom: 32px !important; font-size: 0.9rem; }
   .btn { padding: 11px 20px; font-size: 0.88rem; }
 }
 
-/* ── Global Responsive Fixes ── */
-
-/* Pricing */
-@media (max-width: 900px) {
-  .pricing-grid { grid-template-columns: 1fr !important; max-width: 480px !important; margin: 0 auto !important; }
-}
-
-/* Contact */
-@media (max-width: 768px) {
-  .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-}
-
-/* Dashboard */
-@media (max-width: 768px) {
-  .dashboard-grid { grid-template-columns: 1fr !important; }
-}
-
-/* Navbar user button */
-@media (max-width: 1100px) {
-  .nav-user .btn { padding: 8px 12px !important; font-size: 0.82rem !important; }
-}
-
-/* General mobile fixes */
 @media (max-width: 480px) {
-  .btn { padding: 10px 18px; font-size: 0.88rem; }
-  .card { padding: 18px; }
+  .section { padding: 40px 0; }
+  .container { padding: 0 14px; }
+  .btn { padding: 10px 18px; font-size: 0.85rem; }
+  .card { padding: 18px !important; }
+  input, textarea, select { font-size: 0.9rem; padding: 10px 14px; }
+  .section-title { font-size: clamp(1.35rem, 6vw, 1.7rem) !important; }
 }
 
-/* iPhone SE (375px) */
-@media (max-width: 390px) {
-  .container { padding: 0 12px; }
-  .navbar-inner { gap: 6px; }
-  .nav-logo { font-size: 1.1rem; }
+@media (max-width: 360px) {
+  .section { padding: 32px 0; }
+  .container { padding: 0 10px; }
+  .section-title { font-size: 1.25rem !important; }
 }
 
-/* Tablet (iPad) */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: 1fr !important; max-width: 560px !important; margin: 0 auto !important; }
-}
-
-/* ── About Page Grids & Flexboxes Responsive ── */
-.about-hero-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 80px;
-  align-items: center;
-  margin-bottom: 100px;
-}
-
-.about-image-container {
-  width: 100%;
-  max-width: 380px;
-  aspect-ratio: 1;
-  border-radius: 24px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 30px 80px rgba(99,102,241,0.3);
-  border: 3px solid rgba(99,102,241,0.3);
-}
-
-.about-meta {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.about-actions {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.about-skills-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-@media (max-width: 900px) {
-  .about-hero-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-    text-align: center;
-    margin-bottom: 60px;
-  }
-  
-  .about-image-container {
-    margin: 0 auto;
-  }
-  
-  .about-meta,
-  .about-actions {
-    justify-content: center;
-  }
-  
-  .about-skills-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+@media (max-width: 300px) {
+  .container { padding: 0 6px !important; }
 }

@@ -44,7 +44,12 @@ export default function Navbar() {
               <FiZap size={12} /> FREE AUDIT
             </span>
             <span className="announcement-text">
-              Claim a <strong>100% Free Website Speed, UI & SEO Audit</strong> (Worth $299) — Delivered in 24h
+              <span className="announcement-text-desktop">
+                Claim a <strong>100% Free Website Speed, UI & SEO Audit</strong> (Worth $299) — Delivered in 24h
+              </span>
+              <span className="announcement-text-mobile">
+                <strong>Free Speed & SEO Audit</strong> ($299 Value)
+              </span>
             </span>
           </div>
           <button onClick={e => { e.stopPropagation(); openAuditModal(); }} className="announcement-cta" aria-label="Claim Free Audit">
@@ -70,7 +75,7 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-actions">
-          <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
+          <button className="icon-btn theme-toggle-btn" onClick={toggleTheme} aria-label="Toggle theme">
             {theme === 'dark' ? <FiSun /> : <FiMoon />}
           </button>
 
@@ -84,12 +89,12 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            <Link to="/login" className="icon-btn" title="Client Login" aria-label="Login">
+            <Link to="/login" className="icon-btn nav-login-btn" title="Client Login" aria-label="Login">
               <FiUser size={16} />
             </Link>
           )}
 
-          <Link to="/contact" className="btn btn-primary" style={{ padding: '10px 22px', fontSize: '0.9rem' }}>
+          <Link to="/contact" className="btn btn-primary nav-contact-btn">
             Start a Project
           </Link>
 

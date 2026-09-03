@@ -324,7 +324,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '32px' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '8px' }}>
@@ -370,7 +370,7 @@ export default function AdminDashboard() {
             {showProjectForm && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '20px' }}>{editProject ? 'Edit Project' : 'Add New Project'}</h3>
-                <form onSubmit={handleProjectSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <form onSubmit={handleProjectSubmit} className="form-row-2">
                   <div style={{ gridColumn: '1/-1' }}>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem' }}>Title *</label>
                     <input name="title" defaultValue={editProject?.title || ''} required />
@@ -438,7 +438,7 @@ export default function AdminDashboard() {
             {showServiceForm && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '20px' }}>{editService ? 'Edit Service' : 'Add New Service'}</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-row-2">
                   <div style={{ gridColumn: '1/-1' }}>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem' }}>Title *</label>
                     <input value={serviceForm.title} onChange={e => setServiceForm({ ...serviceForm, title: e.target.value })} placeholder="e.g. Mobile App Development" required />
@@ -556,7 +556,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* India vs International Split */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '28px' }}>
+            <div className="form-row-2" style={{ marginBottom: '28px' }}>
               {/* India ₹ */}
               <div className="card" style={{ padding: '24px', borderLeft: '3px solid #f97316' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
@@ -566,7 +566,7 @@ export default function AdminDashboard() {
                     <div style={{ color: 'var(--text2)', fontSize: '0.78rem' }}>Razorpay · INR (₹)</div>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-row-2">
                   {[
                     { label: 'This Month', value: earningStats.india?.monthly || 0 },
                     { label: 'Last Month', value: earningStats.india?.lastMonth || 0 },
@@ -597,7 +597,7 @@ export default function AdminDashboard() {
                     <div style={{ color: 'var(--text2)', fontSize: '0.78rem' }}>PayPal · USD ($)</div>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-row-2">
                   {[
                     { label: 'This Month', value: earningStats.international?.monthly || 0 },
                     { label: 'Last Month', value: earningStats.international?.lastMonth || 0 },
@@ -629,7 +629,7 @@ export default function AdminDashboard() {
             {showEarningForm && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '20px' }}>Add New Earning</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-row-2">
                   <div style={{ gridColumn: '1/-1' }}>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem' }}>Title *</label>
                     <input value={earningForm.title} onChange={e => setEarningForm({ ...earningForm, title: e.target.value })} placeholder="e.g. Website for ABC Company" />
@@ -733,7 +733,7 @@ export default function AdminDashboard() {
             {showClientProjectForm && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '20px' }}>Assign Client Project</h3>
-                <form onSubmit={handleCpSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <form onSubmit={handleCpSubmit} className="form-row-2">
                   <div>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem' }}>Client *</label>
                     <select value={cpForm.client} onChange={e => setCpForm({ ...cpForm, client: e.target.value })} required>
@@ -934,7 +934,7 @@ export default function AdminDashboard() {
             {showTestimonialForm && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px', border: '1px solid var(--accent)' }}>
                 <h3 style={{ marginBottom: '18px' }}>{editTestimonial ? 'Edit Testimonial' : 'Add New Client Testimonial'}</h3>
-                <form onSubmit={handleTestimonialSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <form onSubmit={handleTestimonialSubmit} className="form-row-2">
                   <div>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Client Name *</label>
                     <input
@@ -1125,7 +1125,7 @@ export default function AdminDashboard() {
             {showBlogForm && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '20px' }}>{editBlog ? 'Edit Blog Post' : 'New Blog Post'}</h3>
-                <form onSubmit={handleBlogSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <form onSubmit={handleBlogSubmit} className="form-row-2">
                   <div>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem' }}>Title *</label>
                     <input value={blogForm.title} onChange={e => setBlogForm({ ...blogForm, title: e.target.value })} required />
@@ -1265,7 +1265,7 @@ export default function AdminDashboard() {
             {supportTickets.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text2)', padding: '40px' }}>No support tickets yet</div>
             ) : (
-              <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '24px' }}>
+              <div className="dashboard-grid">
                 {/* Ticket List */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '600px', overflowY: 'auto', paddingRight: '4px' }}>
                   {supportTickets.map(t => {
@@ -1400,7 +1400,7 @@ export default function AdminDashboard() {
             {showPlanForm && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '20px' }}>{editPlan ? 'Edit Pricing Plan' : 'Add New Pricing Plan'}</h3>
-                <form onSubmit={handlePlanSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <form onSubmit={handlePlanSubmit} className="form-row-2">
                   <div>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem' }}>Plan Name *</label>
                     <input value={planForm.name} onChange={e => setPlanForm({ ...planForm, name: e.target.value })} placeholder="e.g. Basic Website" required />

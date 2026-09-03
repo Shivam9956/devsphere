@@ -49,7 +49,7 @@ export default function BlogPost() {
   }
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section" style={{ maxWidth: '800px', margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Link to="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text2)', marginBottom: '32px', textDecoration: 'none', fontSize: '0.9rem', transition: 'var(--transition)' }}

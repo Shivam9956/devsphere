@@ -36,7 +36,7 @@ export default function Contact() {
   };
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
 
         {/* Header */}
@@ -48,7 +48,7 @@ export default function Contact() {
           </p>
         </motion.div>
 
-        <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '56px', alignItems: 'start' }}>
+        <div className="contact-grid">
 
           {/* Left: Info */}
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
@@ -136,8 +136,8 @@ export default function Contact() {
 
           {/* Right: Form */}
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
-            <form onSubmit={handleSubmit} className="card" style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <form onSubmit={handleSubmit} className="card" style={{ padding: 'clamp(20px, 4vw, 40px)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="form-row-2">
                 <div>
                   <label htmlFor="contact-name" style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text2)' }}>
                     Your Name *

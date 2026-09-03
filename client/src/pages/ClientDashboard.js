@@ -178,7 +178,7 @@ export default function ClientDashboard() {
   };
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '32px' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '8px' }}>
@@ -241,7 +241,7 @@ export default function ClientDashboard() {
                 <p style={{ color: 'var(--text2)' }}>Your projects will appear here once assigned by the admin.</p>
               </div>
             ) : (
-              <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '24px' }}>
+              <div className="dashboard-grid">
                 {/* Project List */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {projects.map(p => {
@@ -363,7 +363,7 @@ export default function ClientDashboard() {
                       )}
 
                       {/* Stage Cards */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                      <div className="stages-grid">
                         {stages.map((stage, i) => {
                           const steps = stages.map(s => s.key);
                           const currentIdx = steps.indexOf(selected.status);
@@ -447,7 +447,7 @@ export default function ClientDashboard() {
                 <p style={{ color: 'var(--text2)' }}>Have questions? Create a ticket and start chatting with our team.</p>
               </div>
             ) : (
-              <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '24px' }}>
+              <div className="dashboard-grid">
                 {/* Ticket List */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '600px', overflowY: 'auto', paddingRight: '4px' }}>
                   {tickets.map(t => {

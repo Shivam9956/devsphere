@@ -61,7 +61,7 @@ export default function TestimonialForm({ onSubmitted }) {
             animate={{ opacity: 1, y: 0 }}
             onSubmit={handleSubmit}
             className="card"
-            style={{ padding: '36px', display: 'flex', flexDirection: 'column', gap: '18px' }}
+            style={{ padding: 'clamp(18px, 4vw, 36px)', display: 'flex', flexDirection: 'column', gap: '18px' }}
           >
             <div>
               <h3 style={{ fontWeight: 700, marginBottom: '6px', fontSize: '1.1rem' }}>Leave a Review</h3>
@@ -95,7 +95,7 @@ export default function TestimonialForm({ onSubmitted }) {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="form-row-2">
               <div>
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text2)' }}>
                   Your Name *
@@ -110,7 +110,7 @@ export default function TestimonialForm({ onSubmitted }) {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="form-row-2">
               <div>
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text2)' }}>
                   Company

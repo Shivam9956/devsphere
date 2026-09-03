@@ -65,10 +65,15 @@ export default function WhatsAppButton() {
       <style>{`
         @media (max-width: 768px) {
           .whatsapp-btn-wrapper {
-            right: auto !important;
-            left: 20px !important;
-            bottom: 20px !important;
-            align-items: flex-start !important;
+            right: 18px !important;
+            left: auto !important;
+            bottom: 18px !important;
+            align-items: flex-end !important;
+          }
+          .whatsapp-btn-wrapper a {
+            width: 50px !important;
+            height: 50px !important;
+            font-size: 1.4rem !important;
           }
         }
       `}</style>

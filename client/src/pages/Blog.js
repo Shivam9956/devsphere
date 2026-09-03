@@ -38,7 +38,7 @@ export default function Blog() {
   }, []);
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginBottom: '48px' }}>
           <div className="section-tag" style={{ display: 'inline-flex', marginBottom: '12px' }}>Blog</div>
@@ -47,7 +47,7 @@ export default function Blog() {
         </motion.div>
 
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
+          <div className="blog-grid">
             {[1, 2, 3].map(i => <SkeletonBlogCard key={i} />)}
           </div>
         ) : blogs.length === 0 ? (
@@ -60,7 +60,6 @@ export default function Blog() {
             initial="hidden"
             animate="visible"
             className="blog-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}
           >
             {blogs.map(blog => (
               <motion.div key={blog._id} variants={fadeUp} className="card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

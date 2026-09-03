@@ -24,13 +24,14 @@ export default function ScrollToTop() {
           whileTap={{ scale: 0.95 }}
           onClick={scrollUp}
           aria-label="Scroll to top"
+          className="scroll-to-top-btn"
           style={{
             position: 'fixed',
             bottom: '30px',
             left: '30px',
             zIndex: 997,
-            width: '46px',
-            height: '46px',
+            width: '44px',
+            height: '44px',
             borderRadius: '50%',
             background: 'var(--card)',
             border: '1.5px solid var(--border2)',
@@ -47,6 +48,17 @@ export default function ScrollToTop() {
           <FiArrowUp />
         </motion.button>
       )}
+      <style>{`
+        @media (max-width: 768px) {
+          .scroll-to-top-btn {
+            left: 18px !important;
+            bottom: 18px !important;
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 1rem !important;
+          }
+        }
+      `}</style>
     </AnimatePresence>
   );
 }

@@ -5,7 +5,7 @@
   align-items: center;
   position: relative;
   overflow: hidden;
-  padding-top: 80px;
+  padding-top: calc(var(--nav-height) + 16px);
 }
 
 .hero-bg {
@@ -403,7 +403,7 @@
   .hero {
     min-height: auto;
     align-items: flex-start;
-    padding-top: 70px;
+    padding-top: calc(var(--nav-height) + 12px);
   }
   .hero-content {
     grid-template-columns: 1fr;
@@ -578,8 +578,21 @@
   }
   .client-portal-promo-card {
     grid-template-columns: 1fr;
-    padding: 40px 24px;
-    gap: 36px;
+    padding: 36px 20px;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .client-portal-promo-card {
+    padding: 24px 14px !important;
+    gap: 22px !important;
+    border-radius: 16px !important;
+  }
+  .client-portal-promo-card .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
   }
 }
 
@@ -587,5 +600,13 @@
   .process-timeline {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+}
+
+@media (max-width: 360px) {
+  .client-portal-promo-card {
+    padding: 18px 10px !important;
+    gap: 16px !important;
+    border-radius: 14px !important;
   }
 }

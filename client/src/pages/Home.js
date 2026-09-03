@@ -640,15 +640,10 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="audit-promo-banner"
             style={{
               background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(124, 58, 237, 0.12) 50%, rgba(6, 182, 212, 0.15) 100%)',
               border: '1px solid rgba(99, 102, 241, 0.3)',
-              borderRadius: '24px',
-              padding: 'clamp(28px, 4vw, 48px)',
-              display: 'grid',
-              gridTemplateColumns: '1.2fr 1fr',
-              gap: '36px',
-              alignItems: 'center',
               position: 'relative',
               overflow: 'hidden',
               boxShadow: '0 12px 40px rgba(0,0,0,0.1)'
@@ -660,7 +655,7 @@ export default function Home() {
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.35)', color: 'var(--accent)', padding: '5px 14px', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 700, marginBottom: '16px' }}>
                 <FiZap size={14} /> FREE AUDIT & CONSULTATION
               </div>
-              <h2 style={{ fontSize: 'clamp(1.6rem, 2.5vw, 2.2rem)', fontWeight: 800, lineHeight: 1.25, marginBottom: '14px', color: 'var(--text)' }}>
+              <h2 style={{ fontSize: 'clamp(1.45rem, 2.5vw, 2.2rem)', fontWeight: 800, lineHeight: 1.25, marginBottom: '14px', color: 'var(--text)' }}>
                 Is Your Current Website <span className="gradient-text">Costing You Clients?</span>
               </h2>
               <p style={{ color: 'var(--text2)', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '24px' }}>
@@ -671,14 +666,25 @@ export default function Home() {
                   type="button"
                   onClick={openAuditModal}
                   className="btn btn-primary"
-                  style={{ padding: '12px 28px', fontSize: '0.95rem', fontWeight: 700, boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}
+                  style={{
+                    padding: '12px 20px',
+                    fontSize: '0.92rem',
+                    fontWeight: 700,
+                    boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
+                    width: '100%',
+                    maxWidth: '400px',
+                    justifyContent: 'center',
+                    whiteSpace: 'normal',
+                    textAlign: 'center',
+                    lineHeight: 1.35
+                  }}
                 >
                   🎁 Claim Free Audit Report (Worth $299)
                 </button>
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', background: 'var(--card)', padding: '24px', borderRadius: '16px', border: '1px solid var(--border)' }}>
+            <div className="audit-features-box" style={{ display: 'flex', flexDirection: 'column', gap: '14px', background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
                 ⚡ What You Get Inside Your Free Audit:
               </div>
@@ -689,10 +695,10 @@ export default function Home() {
                 { title: '3 Actionable Quick Fixes', desc: 'Step-by-step developer recommendations to boost conversion immediately.' }
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                  <span style={{ color: '#10b981', fontWeight: 800, fontSize: '1.1rem', lineHeight: 1 }}>✓</span>
-                  <div>
-                    <strong style={{ fontSize: '0.9rem', color: 'var(--text)', display: 'block' }}>{item.title}</strong>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text2)', lineHeight: 1.4 }}>{item.desc}</span>
+                  <span style={{ color: '#10b981', fontWeight: 800, fontSize: '1.1rem', lineHeight: 1, flexShrink: 0 }}>✓</span>
+                  <div style={{ minWidth: 0 }}>
+                    <strong style={{ fontSize: '0.9rem', color: 'var(--text)', display: 'block', wordBreak: 'break-word' }}>{item.title}</strong>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text2)', lineHeight: 1.4, wordBreak: 'break-word' }}>{item.desc}</span>
                   </div>
                 </div>
               ))}
@@ -710,7 +716,7 @@ export default function Home() {
           <h2 className="section-title">Get In Touch</h2>
           <p className="section-subtitle">Have a project in mind? Let's talk about it.</p>
 
-          <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '56px', alignItems: 'start' }}>
+          <div className="contact-grid">
             {/* Left: Info */}
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
               <h3 style={{ fontSize: '1.4rem', marginBottom: '14px', fontWeight: 700 }}>Let's work together</h3>
@@ -796,8 +802,8 @@ export default function Home() {
 
             {/* Right: Form */}
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-              <form onSubmit={handleContactSubmit} className="card" style={{ padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <form onSubmit={handleContactSubmit} className="card" style={{ padding: 'clamp(20px, 4vw, 40px)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div className="form-row-2">
                   <div>
                     <label htmlFor="home-contact-name" style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text2)' }}>
                       Your Name *

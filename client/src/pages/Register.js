@@ -85,7 +85,7 @@ export default function Register() {
     <div style={{
       minHeight: '100vh',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '100px 24px 40px',
+      padding: 'calc(var(--nav-height) + 20px) clamp(16px, 4vw, 24px) 40px',
       position: 'relative', overflow: 'hidden'
     }}>
       <div style={{ position: 'absolute', top: '15%', left: '8%', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.07), transparent 70%)', pointerEvents: 'none' }} />
@@ -108,8 +108,8 @@ export default function Register() {
           <p style={{ color: 'var(--text2)', fontSize: '0.92rem' }}>Register to track your project progress</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="card" style={{ padding: '36px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+        <form onSubmit={handleSubmit} className="card" style={{ padding: 'clamp(20px, 4vw, 36px)', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div className="form-row-2">
             {field('reg-name', 'Full Name *', <FiUser size={15} />, {
               value: form.name,
               onChange: e => setForm({ ...form, name: e.target.value }),

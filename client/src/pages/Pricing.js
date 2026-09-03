@@ -200,7 +200,7 @@ export default function Pricing() {
   };
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
 
         {/* Header */}
@@ -259,7 +259,7 @@ export default function Pricing() {
             <div className="spinner" />
           </div>
         ) : (
-          <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', maxWidth: '1200px', margin: '0 auto 40px', alignItems: 'stretch' }}>
+          <div className="pricing-grid">
             {plans.map((plan, i) => (
             <motion.div key={plan.id}
               initial={{ opacity: 0, y: 30 }}
@@ -270,7 +270,7 @@ export default function Pricing() {
                 background: 'var(--card)',
                 border: `1.5px solid ${plan.popular ? plan.color : 'var(--border)'}`,
                 borderRadius: '22px',
-                padding: '36px 32px',
+                padding: 'clamp(24px, 4vw, 36px) clamp(18px, 4vw, 32px)',
                 position: 'relative',
                 boxShadow: plan.popular ? `0 20px 60px ${plan.color}20` : 'none',
                 transition: 'var(--transition)',
@@ -366,7 +366,7 @@ export default function Pricing() {
             <motion.div
               initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.85, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '440px' }}
+              style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', padding: 'clamp(20px, 4vw, 36px)', width: '100%', maxWidth: '440px', maxHeight: '90vh', overflowY: 'auto' }}
             >
               {/* Plan summary */}
               <div style={{ marginBottom: '24px' }}>

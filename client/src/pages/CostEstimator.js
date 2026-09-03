@@ -153,7 +153,7 @@ Client Note: ${contactForm.message || 'No additional message.'}`;
   };
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div className="page-wrapper" style={{ position: 'relative', overflow: 'hidden' }}>
       {/* Background orbs */}
       <div style={{ position: 'absolute', top: '15%', left: '5%', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.07), transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: '10%', right: '5%', width: '350px', height: '350px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.06), transparent 70%)', pointerEvents: 'none' }} />
@@ -173,7 +173,7 @@ Client Note: ${contactForm.message || 'No additional message.'}`;
         </div>
 
         {/* Steps Tracker */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
+        <div className="estimator-steps-wrapper">
           {steps.map(s => {
             const isActive = currentStep === s.id;
             const isCompleted = currentStep > s.id;
@@ -199,10 +199,10 @@ Client Note: ${contactForm.message || 'No additional message.'}`;
         </div>
 
         {/* Main Interface Layout */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: '32px', alignItems: 'start', maxWidth: '1120px', margin: '0 auto' }}>
+        <div className="estimator-layout">
           
           {/* Left Panel: Step Form */}
-          <div className="card" style={{ padding: '36px', minHeight: '420px', display: 'flex', flexDirection: 'column' }}>
+          <div className="card" style={{ padding: 'clamp(20px, 4vw, 36px)', minHeight: '420px', display: 'flex', flexDirection: 'column' }}>
             {success ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, textAlign: 'center', padding: '40px 0' }}>
                 <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: 'rgba(16,185,129,0.12)', border: '2px solid rgba(16,185,129,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', fontSize: '2.2rem', marginBottom: '24px' }}>
@@ -226,7 +226,7 @@ Client Note: ${contactForm.message || 'No additional message.'}`;
                   {currentStep === 1 && (
                     <motion.div key="step1" {...slideTransition}>
                       <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '24px' }}>Select Project Type</h2>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div className="estimator-cards-grid">
                         {projectTypes.map(t => (
                           <div 
                             key={t.id} 
@@ -302,7 +302,7 @@ Client Note: ${contactForm.message || 'No additional message.'}`;
                       <p style={{ color: 'var(--text3)', fontSize: '0.85rem', marginBottom: '24px' }}>
                         Choose specific extensions or custom functionalities you want to integrate.
                       </p>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div className="estimator-cards-grid">
                         {featureAddons.map(feat => {
                           const isSel = selectedFeatures.includes(feat.id);
                           return (
@@ -345,7 +345,7 @@ Client Note: ${contactForm.message || 'No additional message.'}`;
                       
                       <div style={{ marginBottom: '24px' }}>
                         <label style={{ display: 'block', fontWeight: 700, fontSize: '0.95rem', marginBottom: '12px' }}>Design Style</label>
-                        <div style={{ display: 'flex', gap: '16px' }}>
+                        <div className="form-row-2">
                           {designLevels.map(d => (
                             <div key={d.id} onClick={() => setDesignLevel(d.id)}
                               style={{
@@ -365,7 +365,7 @@ Client Note: ${contactForm.message || 'No additional message.'}`;
 
                       <div>
                         <label style={{ display: 'block', fontWeight: 700, fontSize: '0.95rem', marginBottom: '12px' }}>Timeline Speed</label>
-                        <div style={{ display: 'flex', gap: '16px' }}>
+                        <div className="form-row-2">
                           {speedLevels.map(s => (
                             <div key={s.id} onClick={() => setSpeedLevel(s.id)}
                               style={{

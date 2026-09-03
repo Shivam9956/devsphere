@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function PrivacyPolicy() {
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container" style={{ maxWidth: '800px', padding: '60px 24px' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '8px' }}>Privacy Policy</h1>

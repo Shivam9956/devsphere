@@ -77,6 +77,7 @@ export default function AuditModal({ isOpen, onClose }) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 20 }}
           transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+          className="audit-modal-card"
           style={{
             background: 'var(--card)',
             border: '1px solid var(--border)',
@@ -205,7 +206,7 @@ export default function AuditModal({ isOpen, onClose }) {
 
               {/* Form */}
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-row-2">
                   <div>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text2)' }}>
                       Your Name *
@@ -236,7 +237,7 @@ export default function AuditModal({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px' }}>
+                <div className="form-row-2">
                   <div>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text2)' }}>
                       Website URL or Concept
@@ -332,6 +333,14 @@ export default function AuditModal({ isOpen, onClose }) {
             </div>
           )}
         </motion.div>
+        <style>{`
+          @media (max-width: 480px) {
+            .audit-modal-card {
+              padding: 22px 16px !important;
+              border-radius: 16px !important;
+            }
+          }
+        `}</style>
       </div>
     </AnimatePresence>
   );

@@ -117,11 +117,15 @@ export default function PaymentBadges({ showText = true, align = 'center' }) {
             gap: '6px',
             fontSize: '0.78rem',
             color: 'var(--text3)',
-            fontWeight: 500
+            fontWeight: 500,
+            maxWidth: '100%',
+            flexWrap: 'wrap'
           }}
         >
           <FiLock size={12} style={{ color: '#10b981', flexShrink: 0 }} />
-          <span>Secure Global Payments via PayPal & Credit/Debit Cards</span>
+          <span style={{ wordBreak: 'break-word', maxWidth: '100%' }}>
+            Secure Global Payments via PayPal & Credit/Debit Cards
+          </span>
         </div>
       )}
     </div>

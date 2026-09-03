@@ -122,7 +122,7 @@ function FAQItem({ q, a }) {
 
 export default function FAQ() {
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="section-title">Frequently Asked Questions</h1>

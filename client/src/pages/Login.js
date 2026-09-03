@@ -69,7 +69,7 @@ export default function Login() {
     <div style={{
       minHeight: '100vh',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '100px 24px 40px',
+      padding: 'calc(var(--nav-height) + 20px) clamp(16px, 4vw, 24px) 40px',
       background: 'var(--bg)',
       position: 'relative',
       overflow: 'hidden'
@@ -96,7 +96,7 @@ export default function Login() {
           <p style={{ color: 'var(--text2)', fontSize: '0.92rem' }}>Sign in to your client dashboard</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="card" style={{ padding: '36px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <form onSubmit={handleSubmit} className="card" style={{ padding: 'clamp(20px, 4vw, 36px)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           {/* Email */}
           <div>

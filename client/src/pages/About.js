@@ -75,7 +75,7 @@ const achievements = [
 
 export default function About() {
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
 
         {/* ── Agency Hero ── */}
@@ -168,16 +168,12 @@ export default function About() {
           </p>
 
           <div
-            className="card"
+            className="card about-founder-card"
             style={{
               background: 'linear-gradient(135deg, rgba(22, 22, 48, 0.95) 0%, rgba(28, 28, 58, 0.95) 100%)',
               border: '1px solid rgba(99, 102, 241, 0.35)',
               borderRadius: '24px',
-              padding: 'clamp(28px, 4vw, 44px)',
-              display: 'grid',
-              gridTemplateColumns: 'minmax(240px, 300px) 1fr',
-              gap: '40px',
-              alignItems: 'center',
+              padding: 'clamp(24px, 4vw, 44px)',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.45), 0 0 30px rgba(99, 102, 241, 0.1)'
             }}
           >

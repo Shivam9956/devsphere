@@ -29,7 +29,7 @@ export default function Services() {
   }, []);
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh' }}>
+    <div className="page-wrapper">
       <div className="container section">
 
         {/* Header */}
@@ -95,7 +95,7 @@ export default function Services() {
         </motion.div>
 
         <div className="grid-4" style={{ marginBottom: '96px', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '40px', left: '12.5%', right: '12.5%', height: '2px', background: 'linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4, #10b981)', opacity: 0.3, zIndex: 0 }} />
+          <div className="process-line-desktop" style={{ position: 'absolute', top: '40px', left: '12.5%', right: '12.5%', height: '2px', background: 'linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4, #10b981)', opacity: 0.3, zIndex: 0 }} />
           {process.map((p, i) => (
             <motion.div key={i} className="card" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} style={{ textAlign: 'center', padding: '32px 24px', position: 'relative', zIndex: 1 }}>
               <div style={{ width: 56, height: 56, borderRadius: '50%', background: `${p.color}15`, border: `2px solid ${p.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: '1.1rem', fontWeight: 800, color: p.color, fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -121,6 +121,11 @@ export default function Services() {
           </div>
         </motion.div>
       </div>
+      <style>{`
+        @media (max-width: 1024px) {
+          .process-line-desktop { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

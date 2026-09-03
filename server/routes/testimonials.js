@@ -17,7 +17,17 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const t = await Testimonial.create(req.body);
-    res.status(201).json({ message: 'Thank you! Your review will be published after approval.' });
+    res.status(201).json({ message: 'Thank you! Your review will be published after approval.', data: t });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin: direct create
+router.post('/admin', protect, adminOnly, async (req, res) => {
+  try {
+    const t = await Testimonial.create({ ...req.body, approved: req.body.approved !== undefined ? req.body.approved : true });
+    res.status(201).json(t);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -37,6 +47,16 @@ router.get('/all', protect, adminOnly, async (req, res) => {
 router.put('/:id/approve', protect, adminOnly, async (req, res) => {
   try {
     const t = await Testimonial.findByIdAndUpdate(req.params.id, { approved: true }, { new: true });
+    res.json(t);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin: update
+router.put('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const t = await Testimonial.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(t);
   } catch (err) {
     res.status(500).json({ message: err.message });

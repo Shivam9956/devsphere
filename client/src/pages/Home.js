@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import CountUp from 'react-countup';
@@ -9,9 +9,12 @@ import { FaReact, FaNodeJs, FaWhatsapp } from 'react-icons/fa';
 import { SiMongodb, SiExpress, SiJavascript, SiTypescript, SiPython } from 'react-icons/si';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import { useAudit } from '../App';
 import ProjectCard from '../components/ProjectCard';
 import TestimonialCard from '../components/TestimonialCard';
 import TestimonialForm from '../components/TestimonialForm';
+import AnimatedCodeBlock from '../components/AnimatedCodeBlock';
+import PaymentBadges from '../components/PaymentBadges';
 import Typewriter from '../components/Typewriter';
 import './Home.css';
 
@@ -23,13 +26,13 @@ const fadeUp = {
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const skills = [
-  { name: 'React.js', icon: <FaReact />, color: '#61dafb', level: 95 },
-  { name: 'Node.js', icon: <FaNodeJs />, color: '#68a063', level: 90 },
-  { name: 'MongoDB', icon: <SiMongodb />, color: '#47a248', level: 85 },
-  { name: 'Express.js', icon: <SiExpress />, color: 'var(--text)', level: 90 },
-  { name: 'JavaScript', icon: <SiJavascript />, color: '#f7df1e', level: 95 },
-  { name: 'TypeScript', icon: <SiTypescript />, color: '#3178c6', level: 80 },
-  { name: 'Python', icon: <SiPython />, color: '#3776ab', level: 75 }
+  { name: 'React.js', icon: <FaReact />, color: '#61dafb', level: 95, link: 'https://react.dev' },
+  { name: 'Node.js', icon: <FaNodeJs />, color: '#68a063', level: 90, link: 'https://nodejs.org' },
+  { name: 'MongoDB', icon: <SiMongodb />, color: '#47a248', level: 85, link: 'https://www.mongodb.com' },
+  { name: 'Express.js', icon: <SiExpress />, color: 'var(--text)', level: 90, link: 'https://expressjs.com' },
+  { name: 'JavaScript', icon: <SiJavascript />, color: '#f7df1e', level: 95, link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript' },
+  { name: 'TypeScript', icon: <SiTypescript />, color: '#3178c6', level: 80, link: 'https://www.typescriptlang.org' },
+  { name: 'Python', icon: <SiPython />, color: '#3776ab', level: 75, link: 'https://www.python.org' }
 ];
 
 const defaultServices = [
@@ -40,21 +43,23 @@ const defaultServices = [
 ];
 
 const techIcons = [
-  { icon: <FaReact />, color: '#61dafb', label: 'React' },
-  { icon: <FaNodeJs />, color: '#68a063', label: 'Node.js' },
-  { icon: <SiMongodb />, color: '#47a248', label: 'MongoDB' },
-  { icon: <SiExpress />, color: 'var(--text)', label: 'Express' },
-  { icon: <SiJavascript />, color: '#f7df1e', label: 'JavaScript' },
-  { icon: <SiPython />, color: '#3776ab', label: 'Python' }
+  { icon: <FaReact />, color: '#61dafb', label: 'React', link: 'https://react.dev' },
+  { icon: <FaNodeJs />, color: '#68a063', label: 'Node.js', link: 'https://nodejs.org' },
+  { icon: <SiMongodb />, color: '#47a248', label: 'MongoDB', link: 'https://www.mongodb.com' },
+  { icon: <SiExpress />, color: 'var(--text)', label: 'Express', link: 'https://expressjs.com' },
+  { icon: <SiJavascript />, color: '#f7df1e', label: 'JavaScript', link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript' },
+  { icon: <SiPython />, color: '#3776ab', label: 'Python', link: 'https://www.python.org' }
 ];
 
 export default function Home() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [services, setServices] = useState([]);
+  const [selectedTestimonialFilter, setSelectedTestimonialFilter] = useState('All');
+  const [showTestimonialForm, setShowTestimonialForm] = useState(false);
+  const { openAuditModal } = useAudit();
   const [statsRef, statsInView] = useInView({ triggerOnce: true, threshold: 0.3 });
-
-
 
   const [contactForm, setContactForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [contactLoading, setContactLoading] = useState(false);
@@ -80,7 +85,7 @@ export default function Home() {
 
   useEffect(() => {
     api.get('/projects').then(r => setProjects(r.data.slice(0, 3))).catch(() => {});
-    api.get('/testimonials').then(r => setTestimonials(r.data.slice(0, 3))).catch(() => {});
+    api.get('/testimonials').then(r => setTestimonials(r.data || [])).catch(() => {});
     api.get('/services-manage').then(r => setServices(r.data || [])).catch(() => {});
   }, []);
 
@@ -120,52 +125,59 @@ export default function Home() {
               DevSphere Global helps businesses, startups, and entrepreneurs build modern, fast, and scalable websites and web applications that grow their online presence.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="hero-cta">
+            <motion.div variants={fadeUp} className="hero-cta" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
               <Link to="/contact" className="btn btn-primary">
                 Get a Free Quote <FiArrowRight size={16} />
               </Link>
-              <Link to="/projects" className="btn btn-outline">
-                View Our Projects
-              </Link>
+              <button
+                type="button"
+                onClick={openAuditModal}
+                className="btn btn-outline"
+                style={{
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  borderColor: 'rgba(99, 102, 241, 0.35)',
+                  color: 'var(--text)',
+                  fontWeight: 600,
+                  gap: '8px'
+                }}
+              >
+                🎁 Free Website Audit
+              </button>
             </motion.div>
 
             <motion.div variants={fadeUp} className="hero-tech">
               {techIcons.map((t, i) => (
-                <div key={i} className="tech-icon" title={t.label} style={{ color: t.color }}>
+                <a
+                  key={i}
+                  href={t.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tech-icon"
+                  title={`Open ${t.label}`}
+                  style={{ color: t.color, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex' }}
+                >
                   {t.icon}
-                </div>
+                </a>
               ))}
             </motion.div>
           </motion.div>
 
-          {/* Code Window */}
+          {/* Animated Code Window */}
           <motion.div
             className="hero-visual"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 0.8, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
           >
-            <div className="hero-card-main">
-              <div className="code-window">
-                <div className="code-dots">
-                  <span /><span /><span />
-                </div>
-                <pre className="code-content">
-                  <span className="code-comment">{'// DevSphere Global'}</span>{'\n'}
-                  <span className="code-key">const</span>{' agency = {\n'}
-                  {'  '}<span className="code-key">founder</span>{': '}<span className="code-str">"Shivam Maurya"</span>{',\n'}
-                  {'  '}<span className="code-key">agency</span>{': '}<span className="code-str">"DevSphere Global"</span>{',\n'}
-                  {'  '}<span className="code-key">specialization</span>{': '}<span className="code-str">"Full Stack Development"</span>{',\n'}
-                  {'  '}<span className="code-key">clients</span>{': '}<span className="code-str">"Worldwide 🌍"</span>{'\n'}
-                  {'};'}
-                </pre>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '12px' }}>
-                <motion.div style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '50px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#10b981' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }}>
-                  <FiZap size={12} /> Available Now
+            <div className="hero-card-main" style={{ width: '100%' }}>
+              <AnimatedCodeBlock />
+              
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '16px' }}>
+                <motion.div style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '50px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: 700, color: '#10b981' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
+                  <FiZap size={12} /> Available for New Projects
                 </motion.div>
-                <motion.div style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '50px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: 600, color: 'var(--accent)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
-                  🌍 Worldwide Clients
+                <motion.div style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '50px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}>
+                  🌍 Worldwide Clients (USA, UK, AU, IN)
                 </motion.div>
               </div>
             </div>
@@ -240,10 +252,16 @@ export default function Home() {
                 {skills.map((skill, i) => (
                   <div key={i}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '0.9rem' }}>
+                      <a
+                        href={skill.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '0.9rem', color: 'inherit', textDecoration: 'none', cursor: 'pointer' }}
+                        title={`Open ${skill.name} documentation`}
+                      >
                         <span style={{ color: skill.color, fontSize: '1.1rem' }}>{skill.icon}</span>
                         {skill.name}
-                      </div>
+                      </a>
                       <span style={{ color: 'var(--text3)', fontSize: '0.82rem', fontWeight: 600 }}>{skill.level}%</span>
                     </div>
                     <div style={{ height: '5px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -268,7 +286,7 @@ export default function Home() {
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-              <div className="section-tag" style={{ display: 'inline-flex' }}>What I Do</div>
+              <div className="section-tag" style={{ display: 'inline-flex' }}>What We Do</div>
             </div>
             <h2 className="section-title">Services We Offer</h2>
             <p className="section-subtitle">End-to-end web development solutions for your business</p>
@@ -283,10 +301,16 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
+                onClick={() => navigate('/services')}
+                style={{ cursor: 'pointer' }}
+                title="Click to view services"
               >
                 <div className="service-icon">{s.icon && typeof s.icon === 'string' ? getIcon(s.icon) : (s.icon || getIcon('FiCode'))}</div>
                 <h3 style={{ marginBottom: '10px', fontWeight: 700, fontSize: '1rem' }}>{s.title}</h3>
                 <p style={{ color: 'var(--text2)', fontSize: '0.88rem', lineHeight: 1.7 }}>{s.desc || s.description}</p>
+                <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent)', fontSize: '0.82rem', fontWeight: 600 }}>
+                  Explore <FiArrowRight size={13} />
+                </div>
               </motion.div>
             ))}
           </div>
@@ -338,7 +362,7 @@ export default function Home() {
               <div className="section-tag" style={{ display: 'inline-flex' }}>Portfolio</div>
             </div>
             <h2 className="section-title">Featured Projects</h2>
-            <p className="section-subtitle">Some of my recent work for global clients</p>
+            <p className="section-subtitle">Recent work built for our global clients</p>
             <div className="grid-3">
               {projects.map((p, i) => (
                 <motion.div key={p._id}
@@ -361,67 +385,189 @@ export default function Home() {
       )}
 
       {/* ── Testimonials ── */}
-      <section className="section" style={{ background: 'var(--bg2)' }}>
+      <section className="section" style={{ background: 'var(--bg2)', position: 'relative', overflow: 'hidden' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-            <div className="section-tag" style={{ display: 'inline-flex' }}>Reviews</div>
-          </div>
-          <h2 className="section-title">Client Testimonials</h2>
-          <p className="section-subtitle">What our clients say about working with us</p>
-          
-          {testimonials.length > 0 ? (
-            <div className="grid-3">
-              {testimonials.map((t, i) => (
-                <motion.div key={t._id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  <TestimonialCard testimonial={t} />
-                </motion.div>
-              ))}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+              <div className="section-tag" style={{ display: 'inline-flex' }}>⭐ Client Trust & Reviews</div>
             </div>
-          ) : (
-            <div className="card" style={{ 
-              textAlign: 'center', 
-              padding: '40px 20px', 
-              maxWidth: '600px',
-              margin: '0 auto 40px auto',
-              border: '1px dashed var(--border)'
+            <h2 className="section-title">What Our Global Clients Say</h2>
+            <p className="section-subtitle">Real feedback from startups, businesses, and entrepreneurs we have helped scale online</p>
+          </motion.div>
+
+          {/* Social Proof Trust Bar (Only when reviews exist) */}
+          {testimonials.length > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '24px',
+              flexWrap: 'wrap',
+              margin: '0 auto 36px',
+              padding: '16px 24px',
+              background: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: '16px',
+              maxWidth: '850px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)'
             }}>
-              <p style={{ fontStyle: 'italic', marginBottom: '8px', fontSize: '1.1rem', color: 'var(--text1)' }}>No reviews yet.</p>
-              <p style={{ fontSize: '0.95rem', color: 'var(--text2)' }}>Be the first to share your experience working with us below!</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '2px', color: '#f59e0b' }}>
+                  {[...Array(5)].map((_, i) => <FiStar key={i} size={15} style={{ fill: '#f59e0b', color: '#f59e0b' }} />)}
+                </div>
+                <span style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--text)' }}>
+                  5.0/5 Client Rating (100% Recommended)
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: 'var(--text2)', fontWeight: 600 }}>
+                <span>🌍</span> Global Delivery
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: 'var(--text2)', fontWeight: 600 }}>
+                <span style={{ color: '#10b981' }}>⚡</span> 100% On-Time Project Delivery
+              </div>
             </div>
           )}
 
-          {/* Testimonial Form */}
-          <div style={{ marginTop: '64px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px' }}>Share Your Experience</h3>
-              <p style={{ color: 'var(--text2)', fontSize: '0.95rem' }}>Worked with us? We'd love to hear your feedback.</p>
+          {/* Category Filter Tabs */}
+          {testimonials.length > 0 && (
+            <div style={{
+              display: 'flex',
+              gap: '10px',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginBottom: '36px'
+            }}>
+              {['All', 'Business Website', 'E-Commerce Store', 'Real Estate Portal', 'SaaS Landing Page', 'Gym & Booking System', 'Healthcare Website', 'Corporate Business Site']
+                .filter(cat => cat === 'All' || testimonials.some(t => t.tag === cat))
+                .map((cat, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedTestimonialFilter(cat)}
+                    className="btn"
+                    style={{
+                      padding: '7px 18px',
+                      fontSize: '0.82rem',
+                      borderRadius: '50px',
+                      fontWeight: 600,
+                      background: selectedTestimonialFilter === cat ? 'var(--accent)' : 'var(--card)',
+                      color: selectedTestimonialFilter === cat ? '#fff' : 'var(--text2)',
+                      border: `1px solid ${selectedTestimonialFilter === cat ? 'var(--accent)' : 'var(--border)'}`,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: selectedTestimonialFilter === cat ? '0 4px 14px rgba(99,102,241,0.35)' : 'none'
+                    }}
+                  >
+                    {cat}
+                  </button>
+                ))}
             </div>
-            <TestimonialForm />
-          </div>
+          )}
+          
+          {testimonials.length === 0 ? (
+            <div className="card" style={{ 
+              textAlign: 'center', 
+              padding: '48px 24px', 
+              maxWidth: '600px',
+              margin: '0 auto 20px auto',
+              border: '1px dashed var(--border)',
+              borderRadius: '20px'
+            }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⭐</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px' }}>No Client Reviews Yet</h3>
+              <p style={{ color: 'var(--text2)', fontSize: '0.92rem', maxWidth: '420px', margin: '0 auto 20px auto', lineHeight: 1.6 }}>
+                Have you worked with DevSphere Global? Be the first to share your experience and feedback!
+              </p>
+              <button 
+                onClick={() => setShowTestimonialForm(true)} 
+                className="btn btn-primary"
+                style={{ padding: '10px 24px', fontWeight: 600 }}
+              >
+                ⭐ Share Your Experience
+              </button>
+            </div>
+          ) : (() => {
+            const filtered = selectedTestimonialFilter === 'All'
+              ? testimonials
+              : testimonials.filter(t => t.tag === selectedTestimonialFilter);
+
+            return filtered.length > 0 ? (
+              <div className="grid-3">
+                {filtered.map((t, i) => (
+                  <motion.div key={t._id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.08 }}
+                  >
+                    <TestimonialCard testimonial={t} />
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="card" style={{ 
+                textAlign: 'center', 
+                padding: '40px 20px', 
+                maxWidth: '600px',
+                margin: '0 auto 40px auto',
+                border: '1px dashed var(--border)'
+              }}>
+                <p style={{ fontStyle: 'italic', marginBottom: '8px', fontSize: '1.1rem', color: 'var(--text1)' }}>No reviews in this category yet.</p>
+                <button onClick={() => setSelectedTestimonialFilter('All')} className="btn btn-outline" style={{ marginTop: '12px' }}>
+                  View All Reviews
+                </button>
+              </div>
+            );
+          })()}
+
+          {/* Testimonial Form Toggle & Section */}
+          {testimonials.length > 0 && (
+            <div style={{ textAlign: 'center', marginTop: '48px' }}>
+              <button
+                onClick={() => setShowTestimonialForm(!showTestimonialForm)}
+                className="btn btn-outline"
+                style={{ padding: '10px 24px', fontWeight: 600, gap: '8px' }}
+              >
+                {showTestimonialForm ? 'Hide Review Form' : '⭐ Share Your Experience Working With Us'}
+              </button>
+            </div>
+          )}
+
+          <AnimatePresence>
+            {showTestimonialForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.35 }}
+                style={{ overflow: 'hidden', marginTop: '36px' }}
+              >
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '6px' }}>Leave a Client Review</h3>
+                  <p style={{ color: 'var(--text2)', fontSize: '0.9rem' }}>Worked with us? We'd love to hear your feedback.</p>
+                </div>
+                <TestimonialForm onSubmitted={() => setShowTestimonialForm(false)} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </section>
 
-      {/* ── Why Choose Me ── */}
+      {/* ── Why Choose Us ── */}
       <section className="section" style={{ background: 'var(--bg)' }}>
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-              <div className="section-tag" style={{ display: 'inline-flex' }}>Why Choose Me</div>
+              <div className="section-tag" style={{ display: 'inline-flex' }}>Why Choose Us</div>
             </div>
             <h2 className="section-title">Built for Results</h2>
-            <p className="section-subtitle">What sets my work apart from the rest</p>
+            <p className="section-subtitle">What sets our work apart from the rest</p>
           </motion.div>
 
           <div className="grid-3">
             {[
-              { icon: <FiZap />, title: 'Fast Delivery', desc: 'Projects delivered on time, every time. Basic sites in 7 days.', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-              { icon: <FiCode />, title: 'Clean Code', desc: 'Well-structured, documented code you can maintain and scale.', color: '#6366f1', bg: 'rgba(99,102,241,0.12)' },
-              { icon: <FiHeadphones />, title: '24/7 Support', desc: 'Always available for questions and quick fixes during support period.', color: '#10b981', bg: 'rgba(16,185,129,0.12)' }
+              { icon: <FiZap />, title: 'Fast Delivery', desc: 'Projects delivered on time, every time. Basic sites in 7 days.', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', path: '/contact' },
+              { icon: <FiCode />, title: 'Clean Code', desc: 'Well-structured, documented code you can maintain and scale.', color: '#6366f1', bg: 'rgba(99,102,241,0.12)', path: '/projects' },
+              { icon: <FiHeadphones />, title: '24/7 Support', desc: 'Always available for questions and quick fixes during support period.', color: '#10b981', bg: 'rgba(16,185,129,0.12)', path: '/contact' }
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -430,7 +576,9 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                style={{ borderTop: `3px solid ${item.color}`, padding: '28px' }}
+                onClick={() => navigate(item.path)}
+                style={{ borderTop: `3px solid ${item.color}`, padding: '28px', cursor: 'pointer' }}
+                title={`Click to learn more about ${item.title}`}
               >
                 <div style={{ width: 52, height: 52, borderRadius: '14px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color, fontSize: '1.4rem', marginBottom: '18px' }}>
                   {item.icon}
@@ -457,10 +605,11 @@ export default function Home() {
               <p style={{ color: 'var(--text2)', lineHeight: 1.8, marginBottom: '28px', fontSize: '0.95rem' }}>
                 We believe in complete transparency. Our custom client dashboard lets you check project milestones, download invoices, calculate price estimates, and raise support tickets in real-time.
               </p>
-              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginBottom: '24px' }}>
                 <Link to="/login" className="btn btn-primary">Log In to Portal</Link>
                 <Link to="/cost-estimator" className="btn btn-outline">Estimate Project Cost</Link>
               </div>
+              <PaymentBadges showText={true} align="left" />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -481,6 +630,74 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Free Website Audit Lead Banner ── */}
+      <section className="section" style={{ background: 'var(--bg)', paddingTop: '20px', paddingBottom: '20px' }}>
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(124, 58, 237, 0.12) 50%, rgba(6, 182, 212, 0.15) 100%)',
+              border: '1px solid rgba(99, 102, 241, 0.3)',
+              borderRadius: '24px',
+              padding: 'clamp(28px, 4vw, 48px)',
+              display: 'grid',
+              gridTemplateColumns: '1.2fr 1fr',
+              gap: '36px',
+              alignItems: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.1)'
+            }}
+          >
+            <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '220px', height: '220px', background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)', filter: 'blur(30px)', pointerEvents: 'none' }} />
+
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.35)', color: 'var(--accent)', padding: '5px 14px', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 700, marginBottom: '16px' }}>
+                <FiZap size={14} /> FREE AUDIT & CONSULTATION
+              </div>
+              <h2 style={{ fontSize: 'clamp(1.6rem, 2.5vw, 2.2rem)', fontWeight: 800, lineHeight: 1.25, marginBottom: '14px', color: 'var(--text)' }}>
+                Is Your Current Website <span className="gradient-text">Costing You Clients?</span>
+              </h2>
+              <p style={{ color: 'var(--text2)', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '24px' }}>
+                Let our senior developers inspect your site’s speed, mobile conversion blockers, and technical SEO bottlenecks. Get a personalized audit report delivered in 24 hours — <strong>100% Free</strong> with zero sales pressure.
+              </p>
+              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={openAuditModal}
+                  className="btn btn-primary"
+                  style={{ padding: '12px 28px', fontSize: '0.95rem', fontWeight: 700, boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}
+                >
+                  🎁 Claim Free Audit Report (Worth $299)
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', background: 'var(--card)', padding: '24px', borderRadius: '16px', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+                ⚡ What You Get Inside Your Free Audit:
+              </div>
+              {[
+                { title: 'Speed & Core Web Vitals', desc: 'Identify heavy scripts, slow TTFB, and assets slowing down your store.' },
+                { title: 'Mobile UI/UX Friction', desc: 'Find tap target errors, layout shifts, and mobile checkout drop-offs.' },
+                { title: 'SEO & Google Indexing', desc: 'Check meta tags, schema markup, and competitor ranking gaps.' },
+                { title: '3 Actionable Quick Fixes', desc: 'Step-by-step developer recommendations to boost conversion immediately.' }
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <span style={{ color: '#10b981', fontWeight: 800, fontSize: '1.1rem', lineHeight: 1 }}>✓</span>
+                  <div>
+                    <strong style={{ fontSize: '0.9rem', color: 'var(--text)', display: 'block' }}>{item.title}</strong>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text2)', lineHeight: 1.4 }}>{item.desc}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -505,25 +722,49 @@ export default function Home() {
                 {[
                   { icon: <FiMail />, label: 'Email', value: 'devsphereglobal@gmail.com', href: 'mailto:devsphereglobal@gmail.com', color: '#6366f1' },
                   { icon: <FaWhatsapp />, label: 'WhatsApp', value: '+91 83539 49006', href: 'https://wa.me/918353949006', color: '#25D366' },
-                  { icon: <FiMapPin />, label: 'Location', value: 'India · Available Worldwide', href: null, color: '#06b6d4' },
-                  { icon: <FiClock />, label: 'Response Time', value: 'Within 24 hours', href: null, color: '#f59e0b' }
+                  { icon: <FiMapPin />, label: 'Location', value: 'India · Available Worldwide', href: 'https://maps.google.com/?q=Surat,+Gujarat,+India', color: '#06b6d4' },
+                  { icon: <FiClock />, label: 'Response Time', value: 'Within 24 hours', subNote: 'Available for Zoom & Google Meet calls', href: 'mailto:devsphereglobal@gmail.com?subject=Schedule%20Discovery%20Call', color: '#f59e0b' }
                 ].map((item, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 12,
-                      background: `${item.color}12`,
-                      border: `1px solid ${item.color}25`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: item.color, flexShrink: 0, fontSize: '1rem'
-                    }}>
-                      {item.icon}
-                    </div>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        target={item.href.startsWith('http') ? '_blank' : undefined}
+                        rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        title={`Open ${item.label}`}
+                        style={{
+                          width: 44, height: 44, borderRadius: 12,
+                          background: `${item.color}12`,
+                          border: `1px solid ${item.color}25`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: item.color, flexShrink: 0, fontSize: '1rem',
+                          textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.background = `${item.color}22`; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = `${item.color}12`; }}
+                      >
+                        {item.icon}
+                      </a>
+                    ) : (
+                      <div style={{
+                        width: 44, height: 44, borderRadius: 12,
+                        background: `${item.color}12`,
+                        border: `1px solid ${item.color}25`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: item.color, flexShrink: 0, fontSize: '1rem'
+                      }}>
+                        {item.icon}
+                      </div>
+                    )}
                     <div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginBottom: '2px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {item.label}
                       </div>
                       {item.href ? (
-                        <a href={item.href} style={{ fontWeight: 600, color: 'var(--text)', fontSize: '0.92rem', transition: 'var(--transition)' }}
+                        <a href={item.href}
+                          target={item.href.startsWith('http') ? '_blank' : undefined}
+                          rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          style={{ fontWeight: 600, color: 'var(--text)', fontSize: '0.92rem', transition: 'var(--transition)' }}
                           onMouseEnter={e => e.currentTarget.style.color = item.color}
                           onMouseLeave={e => e.currentTarget.style.color = 'var(--text)'}
                         >
@@ -531,6 +772,11 @@ export default function Home() {
                         </a>
                       ) : (
                         <div style={{ fontWeight: 600, fontSize: '0.92rem' }}>{item.value}</div>
+                      )}
+                      {item.subNote && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.74rem', color: '#10b981', fontWeight: 600, marginTop: '2px' }}>
+                          <span>📹</span> {item.subNote}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -578,7 +824,7 @@ export default function Home() {
                     Message *
                   </label>
                   <textarea id="home-contact-message" name="message" value={contactForm.message} onChange={handleContactChange}
-                    placeholder="Tell me about your project, timeline, and budget..." required rows={6}
+                    placeholder="Tell us about your project, timeline, and budget..." required rows={6}
                     style={{ resize: 'vertical', minHeight: '140px' }} />
                 </div>
 

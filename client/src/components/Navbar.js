@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSun, FiMoon, FiMenu, FiX, FiUser, FiLogOut } from 'react-icons/fi';
-import { useTheme, useAuth } from '../App';
+import { FiSun, FiMoon, FiMenu, FiX, FiUser, FiLogOut, FiZap } from 'react-icons/fi';
+import { useTheme, useAuth, useAudit } from '../App';
 import './Navbar.css';
 
 const navLinks = [
@@ -18,6 +18,7 @@ const navLinks = [
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
+  const { openAuditModal } = useAudit();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -34,11 +35,29 @@ export default function Navbar() {
   const handleLogout = () => { logout(); navigate('/'); };
 
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-      <div className="container navbar-inner">
-        <Link to="/" className="nav-logo">
-          <span className="gradient-text">DevSphere</span> Global
-        </Link>
+    <header className="navbar-wrapper">
+      {/* Top Global Announcement Bar */}
+      <div className="top-announcement-bar" onClick={openAuditModal} style={{ cursor: 'pointer' }}>
+        <div className="container announcement-inner">
+          <div className="announcement-left">
+            <span className="announcement-badge" style={{ cursor: 'pointer' }}>
+              <FiZap size={12} /> FREE AUDIT
+            </span>
+            <span className="announcement-text">
+              Claim a <strong>100% Free Website Speed, UI & SEO Audit</strong> (Worth $299) — Delivered in 24h
+            </span>
+          </div>
+          <button onClick={e => { e.stopPropagation(); openAuditModal(); }} className="announcement-cta" aria-label="Claim Free Audit">
+            Get Free Report →
+          </button>
+        </div>
+      </div>
+
+      <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+        <div className="container navbar-inner">
+          <Link to="/" className="nav-logo">
+            <span className="gradient-text">DevSphere</span> Global
+          </Link>
 
         <ul className="nav-links">
           {navLinks.map(link => (
@@ -107,9 +126,19 @@ export default function Navbar() {
                 Client Login →
               </Link>
             )}
+            <div style={{ padding: '12px 24px' }}>
+              <button
+                onClick={() => { setMenuOpen(false); openAuditModal(); }}
+                className="btn btn-primary"
+                style={{ width: '100%', justifyContent: 'center', padding: '10px 16px', fontSize: '0.88rem' }}
+              >
+                🎁 Claim Free Website Audit
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
     </nav>
+  </header>
   );
 }

@@ -37,8 +37,10 @@ export default function WhatsAppButton() {
         )}
       </AnimatePresence>
 
-      <motion.button
-        onClick={handleClick}
+      <motion.a
+        href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20DevSphere%20Global!%20I%20visited%20your%20portfolio%20and%20I%27m%20interested%20in%20your%20services.`}
+        target="_blank"
+        rel="noopener noreferrer"
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         whileHover={{ scale: 1.1 }}
@@ -52,12 +54,13 @@ export default function WhatsAppButton() {
           fontSize: '1.6rem',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '0 4px 20px rgba(37,211,102,0.4)',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          textDecoration: 'none'
         }}
         aria-label="Chat on WhatsApp"
       >
         <FaWhatsapp />
-      </motion.button>
+      </motion.a>
 
       <style>{`
         @media (max-width: 768px) {

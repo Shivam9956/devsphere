@@ -56,20 +56,23 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.72;
+  letter-spacing: -0.011em;
   overflow-x: hidden;
   max-width: 100vw;
   transition: background 0.3s, color 0.3s;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5 {
-  font-family: 'Space Grotesk', sans-serif;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', 'Space Grotesk', -apple-system, sans-serif;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  font-weight: 800;
 }
 
 a { text-decoration: none; color: inherit; }

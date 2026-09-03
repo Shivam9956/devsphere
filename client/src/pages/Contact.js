@@ -8,8 +8,8 @@ import api from '../api/axios';
 const contactInfo = [
   { icon: <FiMail />, label: 'Email', value: 'devsphereglobal@gmail.com', href: 'mailto:devsphereglobal@gmail.com', color: '#6366f1' },
   { icon: <FaWhatsapp />, label: 'WhatsApp', value: '+91 83539 49006', href: 'https://wa.me/918353949006', color: '#25D366' },
-  { icon: <FiMapPin />, label: 'Location', value: 'India · Available Worldwide', href: null, color: '#06b6d4' },
-  { icon: <FiClock />, label: 'Response Time', value: 'Within 24 hours', href: null, color: '#f59e0b' }
+  { icon: <FiMapPin />, label: 'Location', value: 'India · Available Worldwide', href: 'https://maps.google.com/?q=Surat,+Gujarat,+India', color: '#06b6d4' },
+  { icon: <FiClock />, label: 'Response Time', value: 'Within 24 hours', subNote: 'Available for Zoom & Google Meet calls', href: 'mailto:devsphereglobal@gmail.com?subject=Schedule%20Discovery%20Call', color: '#f59e0b' }
 ];
 
 export default function Contact() {
@@ -24,7 +24,7 @@ export default function Contact() {
     setLoading(true);
     try {
       await api.post('/contact', form);
-      toast.success("Message sent! I'll get back to you within 24 hours.");
+      toast.success("Message sent! Our team will get back to you within 24 hours.");
       setForm({ name: '', email: '', subject: '', message: '' });
       setSent(true);
       setTimeout(() => setSent(false), 5000);
@@ -41,10 +41,10 @@ export default function Contact() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginBottom: '64px' }}>
-          <div className="section-tag" style={{ display: 'inline-flex', marginBottom: '16px' }}>Contact</div>
+          <div className="section-tag" style={{ display: 'inline-flex', marginBottom: '16px' }}>Contact Us</div>
           <h1 className="section-title" style={{ marginBottom: '16px' }}>Get In Touch</h1>
           <p className="section-subtitle" style={{ marginBottom: 0 }}>
-            Have a project in mind? Let's talk about it.
+            Have a project in mind? Let's discuss your vision and schedule a discovery call.
           </p>
         </motion.div>
 
@@ -54,7 +54,7 @@ export default function Contact() {
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             <h2 style={{ fontSize: '1.4rem', marginBottom: '14px', fontWeight: 700 }}>Let's work together</h2>
             <p style={{ color: 'var(--text2)', lineHeight: 1.85, marginBottom: '36px', fontSize: '0.95rem' }}>
-              We are available for new projects worldwide. Whether you need a simple website, an e-commerce store, or a complex web application, our agency is here to help.
+              We are available for new projects worldwide. Whether you need a high-converting website, an e-commerce store, or a custom full-stack web application, our agency is here to bring your vision to life.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '36px' }}>
@@ -66,21 +66,45 @@ export default function Contact() {
                   transition={{ delay: 0.3 + i * 0.08 }}
                   style={{ display: 'flex', alignItems: 'center', gap: '14px' }}
                 >
-                  <div style={{
-                    width: 44, height: 44, borderRadius: 12,
-                    background: `${item.color}12`,
-                    border: `1px solid ${item.color}25`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: item.color, flexShrink: 0, fontSize: '1rem'
-                  }}>
-                    {item.icon}
-                  </div>
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target={item.href.startsWith('http') ? '_blank' : undefined}
+                      rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      title={`Open ${item.label}`}
+                      style={{
+                        width: 44, height: 44, borderRadius: 12,
+                        background: `${item.color}12`,
+                        border: `1px solid ${item.color}25`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: item.color, flexShrink: 0, fontSize: '1rem',
+                        textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.background = `${item.color}22`; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = `${item.color}12`; }}
+                    >
+                      {item.icon}
+                    </a>
+                  ) : (
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 12,
+                      background: `${item.color}12`,
+                      border: `1px solid ${item.color}25`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: item.color, flexShrink: 0, fontSize: '1rem'
+                    }}>
+                      {item.icon}
+                    </div>
+                  )}
                   <div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginBottom: '2px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       {item.label}
                     </div>
                     {item.href ? (
-                      <a href={item.href} style={{ fontWeight: 600, color: 'var(--text)', fontSize: '0.92rem', transition: 'var(--transition)' }}
+                      <a href={item.href}
+                        target={item.href.startsWith('http') ? '_blank' : undefined}
+                        rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        style={{ fontWeight: 600, color: 'var(--text)', fontSize: '0.92rem', transition: 'var(--transition)' }}
                         onMouseEnter={e => e.currentTarget.style.color = item.color}
                         onMouseLeave={e => e.currentTarget.style.color = 'var(--text)'}
                       >
@@ -88,6 +112,11 @@ export default function Contact() {
                       </a>
                     ) : (
                       <div style={{ fontWeight: 600, fontSize: '0.92rem' }}>{item.value}</div>
+                    )}
+                    {item.subNote && (
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.74rem', color: '#10b981', fontWeight: 600, marginTop: '2px' }}>
+                        <span>📹</span> {item.subNote}
+                      </div>
                     )}
                   </div>
                 </motion.div>
@@ -135,7 +164,7 @@ export default function Contact() {
                   Message *
                 </label>
                 <textarea id="contact-message" name="message" value={form.message} onChange={handleChange}
-                  placeholder="Tell me about your project, timeline, and budget..." required rows={6}
+                  placeholder="Tell us about your project, timeline, and budget..." required rows={6}
                   style={{ resize: 'vertical', minHeight: '140px' }} />
               </div>
 

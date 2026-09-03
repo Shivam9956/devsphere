@@ -4,8 +4,8 @@ import { FiStar, FiSend, FiCheck } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
 
-export default function TestimonialForm() {
-  const [form, setForm] = useState({ name: '', role: '', company: '', country: '', rating: 5, message: '' });
+export default function TestimonialForm({ onSubmitted }) {
+  const [form, setForm] = useState({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '' });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
@@ -19,7 +19,10 @@ export default function TestimonialForm() {
     try {
       await api.post('/testimonials', form);
       setSubmitted(true);
-      toast.success('Thank you for your review!');
+      toast.success('Thank you for your review! It will appear once approved.');
+      if (onSubmitted) {
+        setTimeout(onSubmitted, 3000);
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to submit. Please try again.');
     } finally {
@@ -118,8 +121,37 @@ export default function TestimonialForm() {
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text2)' }}>
                   Country
                 </label>
-                <input name="country" value={form.country} onChange={handleChange} placeholder="USA, UK..." />
+                <input name="country" value={form.country} onChange={handleChange} placeholder="USA, India, UK..." />
               </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text2)' }}>
+                Project Type / Service *
+              </label>
+              <select
+                name="tag"
+                value={form.tag}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  borderRadius: '10px',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text)',
+                  fontSize: '0.9rem'
+                }}
+              >
+                <option value="Business Website">Business Website</option>
+                <option value="E-Commerce Store">E-Commerce Store</option>
+                <option value="Real Estate Portal">Real Estate Portal</option>
+                <option value="SaaS Landing Page">SaaS Landing Page</option>
+                <option value="Gym & Booking System">Gym & Booking System</option>
+                <option value="Healthcare Website">Healthcare Website</option>
+                <option value="Corporate Business Site">Corporate Business Site</option>
+                <option value="Custom Web App">Custom Web App</option>
+              </select>
             </div>
 
             <div>

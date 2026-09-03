@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import PageLoader from './components/PageLoader';
 import ScrollToTop from './components/ScrollToTop';
+import AuditModal from './components/AuditModal';
 
 // Pages
 import Home from './pages/Home';
@@ -31,9 +32,11 @@ import CostEstimator from './pages/CostEstimator';
 
 export const ThemeContext = createContext();
 export const AuthContext = createContext();
+export const AuditContext = createContext();
 
 export function useAuth() { return useContext(AuthContext); }
 export function useTheme() { return useContext(ThemeContext); }
+export function useAudit() { return useContext(AuditContext); }
 
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user } = useAuth();
@@ -44,6 +47,7 @@ function ProtectedRoute({ children, adminOnly = false }) {
 
 function AppContent() {
   const location = useLocation();
+  const { isAuditOpen, closeAuditModal } = useAudit();
   const isInvoicePage = location.pathname.startsWith('/invoice/');
 
   return (
@@ -51,6 +55,7 @@ function AppContent() {
       <Toaster position="top-right" toastOptions={{
         style: { background: 'var(--card)', color: 'var(--text)', border: '1px solid var(--border)' }
       }} />
+      <AuditModal isOpen={isAuditOpen} onClose={closeAuditModal} />
       {!isInvoicePage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -93,6 +98,10 @@ export default function App() {
   });
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(false);
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
+
+  const openAuditModal = () => setIsAuditOpen(true);
+  const closeAuditModal = () => setIsAuditOpen(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -120,11 +129,13 @@ export default function App() {
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <AuthContext.Provider value={{ user, token, login, logout }}>
-        <PayPalScriptProvider options={{ 'client-id': process.env.REACT_APP_PAYPAL_CLIENT_ID, currency: 'USD' }}>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </PayPalScriptProvider>
+        <AuditContext.Provider value={{ isAuditOpen, openAuditModal, closeAuditModal }}>
+          <PayPalScriptProvider options={{ 'client-id': process.env.REACT_APP_PAYPAL_CLIENT_ID, currency: 'USD' }}>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </PayPalScriptProvider>
+        </AuditContext.Provider>
       </AuthContext.Provider>
     </ThemeContext.Provider>
   );

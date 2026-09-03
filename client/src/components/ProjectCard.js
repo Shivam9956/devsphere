@@ -28,10 +28,20 @@ export default function ProjectCard({ project }) {
     >
       {/* Image */}
       <div className="project-img">
-        {project.image ? (
-          <img src={project.image} alt={project.title} loading="lazy" />
+        {project.liveUrl ? (
+          <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>
+            {project.image ? (
+              <img src={project.image} alt={project.title} loading="lazy" />
+            ) : (
+              <div className="project-placeholder">💻</div>
+            )}
+          </a>
         ) : (
-          <div className="project-placeholder">💻</div>
+          project.image ? (
+            <img src={project.image} alt={project.title} loading="lazy" />
+          ) : (
+            <div className="project-placeholder">💻</div>
+          )
         )}
         <div className="project-overlay">
           <div className="project-overlay-btns">
@@ -59,10 +69,18 @@ export default function ProjectCard({ project }) {
             {getImpactMetric(project.category)}
           </span>
         </div>
-        <div className="project-title">{project.title}</div>
+        <div className="project-title">
+          {project.liveUrl ? (
+            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              {project.title} <FiExternalLink size={14} style={{ color: 'var(--accent)' }} />
+            </a>
+          ) : (
+            project.title
+          )}
+        </div>
         <p className="project-desc">{project.description}</p>
         {project.techStack?.length > 0 && (
-          <div className="project-tags" style={{ marginTop: 'auto' }}>
+          <div className="project-tags" style={{ marginTop: 'auto', marginBottom: '14px' }}>
             {project.techStack.slice(0, 4).map((t, i) => (
               <span key={i} className="project-tag">{t}</span>
             ))}
@@ -72,6 +90,31 @@ export default function ProjectCard({ project }) {
           </div>
         )}
 
+        {/* Action Icon Links */}
+        <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid var(--border)' }}>
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+              style={{ flex: 1, padding: '8px 12px', fontSize: '0.8rem', justifyContent: 'center', gap: '6px' }}
+            >
+              <FiExternalLink size={13} /> Live Demo
+            </a>
+          )}
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline"
+              style={{ flex: 1, padding: '8px 12px', fontSize: '0.8rem', justifyContent: 'center', gap: '6px' }}
+            >
+              <FiGithub size={13} /> Code
+            </a>
+          )}
+        </div>
       </div>
     </motion.div>
   );

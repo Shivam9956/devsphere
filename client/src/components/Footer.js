@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin, FaTwitter, FaWhatsapp, FaInstagram } from 'react-icons/fa';
 import { FiMail, FiMapPin, FiArrowUpRight } from 'react-icons/fi';
+import PaymentBadges from './PaymentBadges';
 
 const socials = [
   { icon: <FaGithub />, href: 'https://github.com/Shivam9956', label: 'GitHub' },
@@ -69,7 +70,18 @@ export default function Footer() {
           <div>
             <h4 style={{ fontWeight: 700, marginBottom: '20px', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text)' }}>Services</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {services.map(s => <li key={s} style={{ color: 'var(--text2)', fontSize: '0.9rem' }}>{s}</li>)}
+              {services.map(s => (
+                <li key={s}>
+                  <Link
+                    to="/services"
+                    style={{ color: 'var(--text2)', fontSize: '0.9rem', transition: 'var(--transition)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent)'; e.currentTarget.style.paddingLeft = '4px'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text2)'; e.currentTarget.style.paddingLeft = '0'; }}
+                  >
+                    {s}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -83,9 +95,16 @@ export default function Footer() {
               >
                 <FiMail size={15} style={{ flexShrink: 0 }} /> devsphereglobal@gmail.com
               </a>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text2)', fontSize: '0.88rem' }}>
+              <a
+                href="https://maps.google.com/?q=Surat,+Gujarat,+India"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text2)', fontSize: '0.88rem', transition: 'var(--transition)' }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--text2)'}
+              >
                 <FiMapPin size={15} style={{ flexShrink: 0 }} /> India - Available Worldwide
-              </div>
+              </a>
             </div>
             <Link to="/contact" className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '0.85rem' }}>
               Start a Project <FiArrowUpRight size={14} />
@@ -93,12 +112,25 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Global Payment Badges in Footer */}
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '24px', paddingBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text)', marginBottom: '4px' }}>
+              Global Payment Partners
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text3)' }}>
+              Invoicing & checkout supported in USD ($), EUR (€), GBP (£), AUD (A$), and INR (₹).
+            </p>
+          </div>
+          <PaymentBadges showText={true} align="right" />
+        </div>
+
         {/* Bottom bar */}
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <p style={{ color: 'var(--text3)', fontSize: '0.83rem' }}>
-            {new Date().getFullYear()} DevSphere Global. All rights reserved.
+            © {new Date().getFullYear()} DevSphere Global. All rights reserved.
           </p>
-          <p style={{ color: 'var(--text3)', fontSize: '0.83rem' }}>Crafted with React.js + Node.js</p>
+          <p style={{ color: 'var(--text3)', fontSize: '0.83rem' }}>Crafted with Next.js & Node.js · Worldwide Agency</p>
         </div>
       </div>
 

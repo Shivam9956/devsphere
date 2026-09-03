@@ -34,15 +34,9 @@ async function seed() {
   await Project.deleteMany({});
   console.log('Cleared all project data');
 
-  // 3. Seed testimonials
-  // Delete existing seeded testimonials by their static IDs
-  const testimonialIds = [
-    '6a20610ccd037bf8690215f5',
-    '6a20610ccd037bf8690215f6',
-    '6a20610ccd037bf8690215f7'
-  ];
-  await Testimonial.deleteMany({ _id: { $in: testimonialIds.map(id => new mongoose.Types.ObjectId(id)) } });
-  console.log('Cleared sample testimonials');
+  // 3. Seed testimonials (Keep empty for launch / real client reviews)
+  await Testimonial.deleteMany({});
+  console.log('Cleared all testimonials');
 
  
   // 4. Seed plans

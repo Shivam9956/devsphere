@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
 import { useCurrency } from '../hooks/useCurrency';
+import PaymentBadges from '../components/PaymentBadges';
 
 const defaultPlans = [
   {
@@ -233,19 +234,23 @@ export default function Pricing() {
         )}
 
         {/* Payment badges */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '48px', flexWrap: 'wrap' }}>
-          {[
-            { icon: <SiRazorpay size={18} />, label: 'Razorpay', sub: 'UPI · Cards · NetBanking (India)', color: '#2d81f7' },
-            { icon: <SiPaypal size={18} />, label: 'PayPal', sub: 'International · Cards', color: '#003087' }
-          ].map((g, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderRadius: '50px', background: 'var(--card)', border: '1px solid var(--border)' }}>
-              <span style={{ color: g.color }}>{g.icon}</span>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{g.label}</div>
-                <div style={{ color: 'var(--text2)', fontSize: '0.75rem' }}>{g.sub}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', marginBottom: '48px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            {[
+              { icon: <SiRazorpay size={18} />, label: 'Razorpay', sub: 'UPI · Cards · NetBanking (India)', color: '#2d81f7' },
+              { icon: <SiPaypal size={18} />, label: 'PayPal', sub: 'International · Cards · Multi-Currency', color: '#003087' }
+            ].map((g, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderRadius: '50px', background: 'var(--card)', border: '1px solid var(--border)' }}>
+                <span style={{ color: g.color }}>{g.icon}</span>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{g.label}</div>
+                  <div style={{ color: 'var(--text2)', fontSize: '0.75rem' }}>{g.sub}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <PaymentBadges showText={true} align="center" />
         </div>
 
         {/* Plans */}
@@ -423,9 +428,9 @@ export default function Pricing() {
                 </button>
               </div>
 
-              <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: '0.78rem', marginTop: '16px' }}>
-                🔒 Secure & encrypted payment. No card details stored.
-              </p>
+              <div style={{ marginTop: '16px' }}>
+                <PaymentBadges showText={true} align="center" />
+              </div>
             </motion.div>
           </motion.div>
         )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiPlus, FiEdit2, FiTrash2, FiMail, FiUsers, FiFolder, FiMessageSquare, FiCheck, FiX, FiSend } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiMail, FiUsers, FiFolder, FiMessageSquare, FiCheck, FiX, FiSend, FiStar } from 'react-icons/fi';
 import { iconGroups, getIcon } from '../utils/iconMap';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
@@ -57,6 +57,13 @@ export default function AdminDashboard() {
   const [showPlanForm, setShowPlanForm] = useState(false);
   const [editPlan, setEditPlan] = useState(null);
   const [planForm, setPlanForm] = useState({ id: '', name: '', priceUSD: '', priceINR: '', desc: '', features: '', color: '#6366f1', popular: false, order: 0 });
+
+  // Testimonial states
+  const [showTestimonialForm, setShowTestimonialForm] = useState(false);
+  const [editTestimonial, setEditTestimonial] = useState(null);
+  const [testimonialForm, setTestimonialForm] = useState({
+    name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true
+  });
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -191,9 +198,35 @@ export default function AdminDashboard() {
   };
 
   const deleteTestimonial = async (id) => {
+    if (!window.confirm('Delete this testimonial?')) return;
     await api.delete(`/testimonials/${id}`);
     toast.success('Deleted');
     fetchAll();
+  };
+
+  const handleTestimonialSubmit = async e => {
+    e.preventDefault();
+    if (!testimonialForm.name || !testimonialForm.message) {
+      return toast.error('Client name and message are required');
+    }
+    setLoading(true);
+    try {
+      if (editTestimonial) {
+        await api.put(`/testimonials/${editTestimonial._id}`, testimonialForm);
+        toast.success('Testimonial updated successfully');
+      } else {
+        await api.post('/testimonials/admin', testimonialForm);
+        toast.success('Testimonial added successfully');
+      }
+      setShowTestimonialForm(false);
+      setEditTestimonial(null);
+      setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true });
+      fetchAll();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error saving testimonial');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const markRead = async (id) => {
@@ -879,27 +912,204 @@ export default function AdminDashboard() {
 
         {/* Testimonials Tab */}
         {activeTab === 'Testimonials' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {testimonials.map(t => (
-              <div key={t._id} className="card" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                    <span style={{ fontWeight: 600 }}>{t.name}</span>
-                    {t.company && <span style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>{t.company}</span>}
-                    <span className="badge" style={{ fontSize: '0.7rem', background: t.approved ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: t.approved ? 'var(--green)' : 'var(--yellow)', borderColor: t.approved ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)' }}>
-                      {t.approved ? 'Approved' : 'Pending'}
-                    </span>
-                  </div>
-                  <p style={{ color: 'var(--text2)', fontSize: '0.9rem' }}>{t.message}</p>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {!t.approved && (
-                    <button className="icon-btn" onClick={() => approveTestimonial(t._id)} style={{ borderColor: 'var(--green)', color: 'var(--green)' }}><FiCheck /></button>
-                  )}
-                  <button className="icon-btn" onClick={() => deleteTestimonial(t._id)} style={{ borderColor: 'var(--red)', color: 'var(--red)' }}><FiTrash2 /></button>
-                </div>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Client Testimonials ({testimonials.length})</h3>
+                <p style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>Add, edit, and approve real reviews from clients</p>
               </div>
-            ))}
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setShowTestimonialForm(true);
+                  setEditTestimonial(null);
+                  setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true });
+                }}
+              >
+                <FiPlus /> Add Real Testimonial
+              </button>
+            </div>
+
+            {/* Testimonial Form Modal/Card */}
+            {showTestimonialForm && (
+              <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '28px', marginBottom: '24px', border: '1px solid var(--accent)' }}>
+                <h3 style={{ marginBottom: '18px' }}>{editTestimonial ? 'Edit Testimonial' : 'Add New Client Testimonial'}</h3>
+                <form onSubmit={handleTestimonialSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Client Name *</label>
+                    <input
+                      value={testimonialForm.name}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, name: e.target.value })}
+                      placeholder="e.g. Liam O'Connor or Rahul Sharma"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Role / Designation</label>
+                    <input
+                      value={testimonialForm.role || ''}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, role: e.target.value })}
+                      placeholder="e.g. Founder & CEO"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Company Name</label>
+                    <input
+                      value={testimonialForm.company || ''}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, company: e.target.value })}
+                      placeholder="e.g. Apex Living Retail"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Country</label>
+                    <input
+                      value={testimonialForm.country || ''}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, country: e.target.value })}
+                      placeholder="e.g. India 🇮🇳 or United States 🇺🇸"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Project / Category Tag</label>
+                    <select
+                      value={testimonialForm.tag || 'Business Website'}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, tag: e.target.value })}
+                    >
+                      <option value="Business Website">Business Website</option>
+                      <option value="E-Commerce Store">E-Commerce Store</option>
+                      <option value="Real Estate Portal">Real Estate Portal</option>
+                      <option value="SaaS Landing Page">SaaS Landing Page</option>
+                      <option value="Gym & Booking System">Gym & Booking System</option>
+                      <option value="Healthcare Website">Healthcare Website</option>
+                      <option value="Corporate Business Site">Corporate Business Site</option>
+                      <option value="Custom Web App">Custom Web App</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Rating (1 - 5 Stars)</label>
+                    <select
+                      value={testimonialForm.rating || 5}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, rating: Number(e.target.value) })}
+                    >
+                      <option value={5}>⭐⭐⭐⭐⭐ (5 Stars)</option>
+                      <option value={4}>⭐⭐⭐⭐ (4 Stars)</option>
+                      <option value={3}>⭐⭐⭐ (3 Stars)</option>
+                      <option value={2}>⭐⭐ (2 Stars)</option>
+                      <option value={1}>⭐ (1 Star)</option>
+                    </select>
+                  </div>
+                  <div style={{ gridColumn: '1/-1' }}>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Client Review Message *</label>
+                    <textarea
+                      value={testimonialForm.message}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, message: e.target.value })}
+                      placeholder="Write what the client said about your work..."
+                      rows={4}
+                      required
+                    />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <input
+                      type="checkbox"
+                      id="approvedTestimonial"
+                      checked={testimonialForm.approved !== false}
+                      onChange={e => setTestimonialForm({ ...testimonialForm, approved: e.target.checked })}
+                      style={{ width: 'auto' }}
+                    />
+                    <label htmlFor="approvedTestimonial" style={{ fontSize: '0.9rem', cursor: 'pointer', fontWeight: 600 }}>
+                      Publish Immediately (Approved)
+                    </label>
+                  </div>
+                  <div style={{ gridColumn: '1/-1', display: 'flex', gap: '12px', marginTop: '10px' }}>
+                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                      {loading ? 'Saving...' : editTestimonial ? 'Update Testimonial' : 'Publish Testimonial'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={() => { setShowTestimonialForm(false); setEditTestimonial(null); }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+
+            {testimonials.length === 0 ? (
+              <div className="card" style={{ textAlign: 'center', color: 'var(--text2)', padding: '60px 20px', border: '1px dashed var(--border)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>⭐</div>
+                <h4 style={{ color: 'var(--text)', marginBottom: '8px', fontSize: '1.1rem' }}>No Testimonials in Database</h4>
+                <p style={{ maxWidth: '450px', margin: '0 auto 20px auto', fontSize: '0.9rem' }}>
+                  Demo testimonials have been removed. Click "+ Add Real Testimonial" above to add your actual client reviews.
+                </p>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setShowTestimonialForm(true);
+                    setEditTestimonial(null);
+                    setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true });
+                  }}
+                >
+                  <FiPlus /> Add Your First Real Review
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {testimonials.map(t => (
+                  <div key={t._id} className="card" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                    <div style={{ flex: 1, minWidth: '280px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>{t.name}</span>
+                        {t.role && <span style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>• {t.role}</span>}
+                        {t.company && <span style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>at <strong>{t.company}</strong></span>}
+                        {t.country && <span style={{ fontSize: '0.85rem' }}>({t.country})</span>}
+                        <span className="badge" style={{ fontSize: '0.72rem', background: t.approved ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: t.approved ? 'var(--green)' : 'var(--yellow)', borderColor: t.approved ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)' }}>
+                          {t.approved ? '✓ Approved' : '⏳ Pending'}
+                        </span>
+                        {t.tag && (
+                          <span className="badge" style={{ fontSize: '0.72rem', background: 'rgba(99,102,241,0.1)', color: 'var(--accent)' }}>
+                            {t.tag}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '2px', color: '#f59e0b', marginBottom: '8px' }}>
+                        {[...Array(t.rating || 5)].map((_, i) => <FiStar key={i} size={14} style={{ fill: '#f59e0b', color: '#f59e0b' }} />)}
+                      </div>
+                      <p style={{ color: 'var(--text)', fontSize: '0.92rem', lineHeight: 1.6, fontStyle: 'italic' }}>
+                        "{t.message}"
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <button
+                        className="icon-btn"
+                        onClick={() => {
+                          setEditTestimonial(t);
+                          setTestimonialForm({
+                            name: t.name || '',
+                            role: t.role || '',
+                            company: t.company || '',
+                            country: t.country || '',
+                            tag: t.tag || 'Business Website',
+                            rating: t.rating || 5,
+                            message: t.message || '',
+                            approved: t.approved !== false
+                          });
+                          setShowTestimonialForm(true);
+                        }}
+                        title="Edit Testimonial"
+                        style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
+                      >
+                        <FiEdit2 />
+                      </button>
+                      {!t.approved && (
+                        <button className="icon-btn" onClick={() => approveTestimonial(t._id)} style={{ borderColor: 'var(--green)', color: 'var(--green)' }} title="Approve"><FiCheck /></button>
+                      )}
+                      <button className="icon-btn" onClick={() => deleteTestimonial(t._id)} style={{ borderColor: 'var(--red)', color: 'var(--red)' }} title="Delete"><FiTrash2 /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -14,30 +14,36 @@ const transporter = nodemailer.createTransport({
 router.post('/', async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
+    if (!name || !email || !message) {
+      return res.status(400).json({ message: 'Please provide name, email, and message.' });
+    }
     const contact = await Contact.create({ name, email, subject, message });
 
     // Send email notification
     try {
-      await transporter.sendMail({
-        from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
-        to: process.env.ADMIN_EMAIL,
-        subject: `New Contact: ${subject || 'Portfolio Inquiry'} from ${name}`,
-        html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Subject:</strong> ${subject || 'N/A'}</p>
-          <p><strong>Message:</strong></p>
-          <p>${message}</p>
-        `
-      });
+      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+        await transporter.sendMail({
+          from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+          to: process.env.ADMIN_EMAIL || process.env.SMTP_USER,
+          subject: `New Contact: ${subject || 'Portfolio Inquiry'} from ${name}`,
+          html: `
+            <h2>New Contact Form Submission</h2>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Subject:</strong> ${subject || 'N/A'}</p>
+            <p><strong>Message:</strong></p>
+            <p>${message}</p>
+          `
+        });
+      }
     } catch (emailErr) {
       console.error('Email send failed:', emailErr.message);
     }
 
     res.status(201).json({ message: 'Message sent successfully!' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Contact submit error:', err);
+    res.status(500).json({ message: err.message || 'Server error while sending message' });
   }
 });
 

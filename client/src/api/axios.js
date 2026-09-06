@@ -5,10 +5,18 @@ const getBaseURL = () => {
   if (envUrl && !envUrl.includes('localhost')) {
     return envUrl;
   }
-  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return `http://${window.location.hostname}:5000/api`;
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+  const isPrivateIp = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(hostname);
+
+  if (isLocal) {
+    return envUrl || 'http://localhost:5000/api';
   }
-  return envUrl || 'http://localhost:5000/api';
+  if (isPrivateIp) {
+    return `http://${hostname}:5000/api`;
+  }
+  // Production live domain (e.g., devsphereglobal.xyz)
+  return envUrl || `${window.location.origin}/api`;
 };
 
 const api = axios.create({

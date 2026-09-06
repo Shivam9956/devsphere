@@ -13,9 +13,13 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  'https://devsphereglobal.xyz',
+  'https://www.devsphereglobal.xyz',
+  'http://devsphereglobal.xyz',
+  'http://www.devsphereglobal.xyz',
   'http://localhost:3000',
   'http://127.0.0.1:3000'
-].map(url => url ? url.replace(/\/$/, '') : url);
+].filter(Boolean).map(url => url.replace(/\/$/, ''));
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -26,14 +30,15 @@ app.use(cors({
     // Allow local network origins dynamically
     const isLocal = /^(https?:\/\/localhost(:\d+)?)|(https?:\/\/127\.0\.0\.1(:\d+)?)|(https?:\/\/192\.168\.\d+\.\d+(:\d+)?)|(https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?)|(https?:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?)$/.test(cleanOrigin);
     
-    // Check if origin matches CLIENT_URL (with or without www)
+    // Check if origin matches CLIENT_URL or devsphereglobal.xyz domain
+    const isDomainAllowed = cleanOrigin.includes('devsphereglobal.xyz');
     const isClientAllowed = cleanClientUrl && (
       cleanOrigin === cleanClientUrl ||
       cleanOrigin === cleanClientUrl.replace('://', '://www.') ||
       cleanOrigin.replace('://www.', '://') === cleanClientUrl
     );
 
-    if (isLocal || isClientAllowed || allowedOrigins.includes(cleanOrigin)) {
+    if (isLocal || isClientAllowed || isDomainAllowed || allowedOrigins.includes(cleanOrigin)) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'));

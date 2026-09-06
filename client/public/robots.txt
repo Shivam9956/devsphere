@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /invoice/
+Disallow: /auth/
+
+Sitemap: https://devsphereglobal.xyz/sitemap.xml

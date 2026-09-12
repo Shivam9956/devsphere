@@ -5,10 +5,23 @@ const dotenv = require('dotenv');
 const path = require('path');
 const session = require('express-session');
 const passport = require('passport');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
+const { globalLimiter, paymentLimiter } = require('./middleware/rateLimiter');
 
 dotenv.config();
 
 const app = express();
+
+// Trust reverse proxy (for accurate client IPs on Render, Vercel, Cloudflare)
+app.set('trust proxy', 1);
+
+// Security HTTP Headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginEmbedderPolicy: false
+}));
 
 // Middleware
 const allowedOrigins = [
@@ -45,11 +58,30 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
+
+// Payload limits to prevent DoS attacks
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+
+// Sanitize inputs to prevent NoSQL Injection ($ and . operators)
+app.use(mongoSanitize());
+
+// Prevent HTTP Parameter Pollution
+app.use(hpp());
+
+// Global API rate limiting
+app.use('/api', globalLimiter);
+
 app.use(session({
   secret: process.env.JWT_SECRET || 'session_secret',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -57,18 +89,19 @@ app.use(passport.session());
 // Load passport strategies
 require('./routes/auth');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/support', require('./routes/support'));
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/contact', require('./routes/contact'));
-app.use('/api/payments', require('./routes/payments'));
+app.use('/api/payments', paymentLimiter, require('./routes/payments'));
 const { createOrderHandler, verifyPaymentHandler, paypalCreateOrderHandler, paypalCaptureOrderHandler } = require('./routes/payments');
-app.post('/api/create-order', createOrderHandler);
-app.post('/api/verify-payment', verifyPaymentHandler);
-app.post('/api/paypal/create-order', paypalCreateOrderHandler);
-app.post('/api/paypal/capture-order', paypalCaptureOrderHandler);
+app.post('/api/create-order', paymentLimiter, createOrderHandler);
+app.post('/api/verify-payment', paymentLimiter, verifyPaymentHandler);
+app.post('/api/paypal/create-order', paymentLimiter, paypalCreateOrderHandler);
+app.post('/api/paypal/capture-order', paymentLimiter, paypalCaptureOrderHandler);
 app.use('/api/testimonials', require('./routes/testimonials'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/services-manage', require('./routes/services'));
@@ -78,7 +111,7 @@ app.use('/api/newsletter', require('./routes/newsletter'));
 app.use('/api/plans', require('./routes/plans'));
 
 // Health check
-app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'Server running' }));
+app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'Server running securely' }));
 
 // Connect DB & Start
 mongoose.connect(process.env.MONGO_URI)

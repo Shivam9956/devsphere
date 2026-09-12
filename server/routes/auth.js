@@ -5,9 +5,13 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '7d' });
+
+// Email regex pattern for validation
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // ── Google OAuth Strategy ──────────────────────────────────────────────────
 passport.use(new GoogleStrategy({
@@ -58,13 +62,35 @@ passport.deserializeUser(async (id, done) => {
 // ── Email/Password Routes ──────────────────────────────────────────────────
 
 // Register
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
-    const { name, email, password, company, phone, country } = req.body;
+    let { name, email, password, company, phone, country } = req.body;
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ message: 'Name is required' });
+    }
+    if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
+      return res.status(400).json({ message: 'A valid email address is required' });
+    }
+    if (!password || typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+
+    name = name.trim();
+    email = email.trim().toLowerCase();
+
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email already registered' });
 
-    const user = await User.create({ name, email, password, company, phone, country });
+    const user = await User.create({
+      name,
+      email,
+      password,
+      company: company ? String(company).trim() : undefined,
+      phone: phone ? String(phone).trim() : undefined,
+      country: country ? String(country).trim() : ''
+    });
+
     const token = signToken(user._id);
     res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, country: user.country } });
   } catch (err) {
@@ -73,9 +99,15 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+
+    if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    email = email.trim().toLowerCase();
     const user = await User.findOne({ email });
 
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });

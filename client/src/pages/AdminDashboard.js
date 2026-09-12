@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiPlus, FiEdit2, FiTrash2, FiMail, FiUsers, FiFolder, FiMessageSquare, FiCheck, FiX, FiSend, FiStar } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiMail, FiUsers, FiFolder, FiMessageSquare, FiCheck, FiX, FiSend, FiStar, FiGlobe, FiPhone, FiExternalLink } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { iconGroups, getIcon } from '../utils/iconMap';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
@@ -887,26 +888,103 @@ export default function AdminDashboard() {
 
         {/* Messages Tab */}
         {activeTab === 'Messages' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {messages.length === 0 ? (
-              <div style={{ textAlign: 'center', color: 'var(--text2)', padding: '40px' }}>No messages yet</div>
-            ) : messages.map(m => (
-              <div key={m._id} className="card" style={{ padding: '20px', borderLeft: `3px solid ${m.read ? 'var(--border)' : 'var(--accent)'}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
-                  <div>
-                    <span style={{ fontWeight: 600 }}>{m.name}</span>
-                    <span style={{ color: 'var(--text2)', fontSize: '0.85rem', marginLeft: '10px' }}>{m.email}</span>
-                    {!m.read && <span className="badge" style={{ marginLeft: '10px', fontSize: '0.7rem' }}>New</span>}
+              <div style={{ textAlign: 'center', color: 'var(--text2)', padding: '40px' }}>No messages or audit requests yet</div>
+            ) : messages.map(m => {
+              const isAudit = m.type === 'audit' || (m.subject && m.subject.toLowerCase().includes('audit'));
+              return (
+                <div
+                  key={m._id}
+                  className="card"
+                  style={{
+                    padding: '22px',
+                    borderLeft: `4px solid ${!m.read ? (isAudit ? '#f59e0b' : 'var(--accent)') : 'var(--border)'}`,
+                    background: !m.read && isAudit ? 'rgba(245, 158, 11, 0.04)' : undefined
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)' }}>{m.name}</span>
+                      <a href={`mailto:${m.email}`} style={{ color: 'var(--accent)', fontSize: '0.88rem', textDecoration: 'none' }}>
+                        {m.email}
+                      </a>
+                      {isAudit && (
+                        <span
+                          style={{
+                            padding: '3px 10px',
+                            borderRadius: '20px',
+                            background: 'rgba(245, 158, 11, 0.15)',
+                            color: '#f59e0b',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            border: '1px solid rgba(245, 158, 11, 0.3)'
+                          }}
+                        >
+                          ⚡ FREE AUDIT REQUEST
+                        </span>
+                      )}
+                      {!m.read && (
+                        <span className="badge" style={{ fontSize: '0.7rem' }}>New</span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text3)', fontSize: '0.8rem' }}>{new Date(m.createdAt).toLocaleDateString()}</span>
+                      {!m.read && (
+                        <button className="icon-btn" onClick={() => markRead(m._id)} title="Mark as read">
+                          <FiCheck />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span style={{ color: 'var(--text2)', fontSize: '0.8rem' }}>{new Date(m.createdAt).toLocaleDateString()}</span>
-                    {!m.read && <button className="icon-btn" onClick={() => markRead(m._id)} title="Mark as read"><FiCheck /></button>}
-                  </div>
+
+                  {m.subject && (
+                    <div style={{ fontWeight: 600, marginBottom: '8px', fontSize: '0.92rem', color: 'var(--text)' }}>
+                      {m.subject}
+                    </div>
+                  )}
+
+                  {/* Extra metadata for audit requests */}
+                  {(m.phone || m.website) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '12px', padding: '10px 14px', background: 'var(--bg2)', borderRadius: '8px', fontSize: '0.85rem' }}>
+                      {m.website && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <FiGlobe style={{ color: '#06b6d4' }} />
+                          <span style={{ color: 'var(--text2)' }}>Website:</span>
+                          <a
+                            href={m.website.startsWith('http') ? m.website : `https://${m.website}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: '#06b6d4', fontWeight: 600, textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                          >
+                            {m.website} <FiExternalLink size={12} />
+                          </a>
+                        </div>
+                      )}
+                      {m.phone && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <FiPhone style={{ color: '#10b981' }} />
+                          <span style={{ color: 'var(--text2)' }}>Phone / WhatsApp:</span>
+                          <span style={{ fontWeight: 600, color: 'var(--text)' }}>{m.phone}</span>
+                          <a
+                            href={`https://wa.me/${m.phone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ marginLeft: '4px', color: '#25D366', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 600 }}
+                          >
+                            <FaWhatsapp /> Chat
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <p style={{ color: 'var(--text2)', fontSize: '0.9rem', lineHeight: 1.6, whiteSpace: 'pre-line', margin: 0 }}>
+                    {m.message}
+                  </p>
                 </div>
-                {m.subject && <div style={{ fontWeight: 500, marginBottom: '6px', fontSize: '0.9rem' }}>{m.subject}</div>}
-                <p style={{ color: 'var(--text2)', fontSize: '0.9rem', lineHeight: 1.6 }}>{m.message}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

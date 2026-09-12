@@ -3,6 +3,7 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 const Contact = require('../models/Contact');
 const { protect, adminOnly } = require('../middleware/auth');
+const { contactLimiter } = require('../middleware/rateLimiter');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -11,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Submit contact form
-router.post('/', async (req, res) => {
+router.post('/', contactLimiter, async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
     if (!name || !email || !message) {
@@ -48,7 +49,7 @@ router.post('/', async (req, res) => {
 });
 
 // Submit Free Website & SEO Audit request
-router.post('/audit', async (req, res) => {
+router.post('/audit', contactLimiter, async (req, res) => {
   try {
     const { name, email, phone, website, goal, details } = req.body;
     if (!name || !email) {

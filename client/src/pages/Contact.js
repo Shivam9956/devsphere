@@ -23,13 +23,17 @@ export default function Contact() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/contact', form);
+      const res = await api.post('/contact', form);
+      // Check if response is valid JSON from backend (not raw HTML fallback)
+      if (typeof res.data === 'string' && res.data.includes('<!doctype')) {
+        throw new Error('API server is connecting. Please also reach us directly via WhatsApp for instant response.');
+      }
       toast.success("Message sent! Our team will get back to you within 24 hours.");
       setForm({ name: '', email: '', subject: '', message: '' });
       setSent(true);
       setTimeout(() => setSent(false), 5000);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to send message');
+      toast.error(err.response?.data?.message || err.message || 'Failed to send message');
     } finally {
       setLoading(false);
     }

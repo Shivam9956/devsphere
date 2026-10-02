@@ -28,11 +28,14 @@ export default function AuditModal({ isOpen, onClose }) {
 
     setLoading(true);
     try {
-      await api.post('/contact/audit', form);
+      const res = await api.post('/contact/audit', form);
+      if (typeof res.data === 'string' && res.data.includes('<!doctype')) {
+        throw new Error('API server is connecting. Please also reach us directly via WhatsApp for instant report.');
+      }
       setSubmitted(true);
       toast.success('Audit request received! Check your email/WhatsApp in 24 hours.');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to submit request. Please try again.');
+      toast.error(err.response?.data?.message || err.message || 'Failed to submit request. Please try again.');
     } finally {
       setLoading(false);
     }

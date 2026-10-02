@@ -111,14 +111,29 @@ app.use('/api/newsletter', require('./routes/newsletter'));
 app.use('/api/plans', require('./routes/plans'));
 
 // Health check
-app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'Server running securely' }));
+app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'Server running securely', timestamp: new Date() }));
 
-// Connect DB & Start
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('MongoDB connected');
+// Connect DB & Start in standalone mode
+if (require.main === module || (!process.env.VERCEL && process.env.NODE_ENV !== 'test')) {
+  if (process.env.MONGO_URI) {
+    mongoose.connect(process.env.MONGO_URI)
+      .then(() => {
+        console.log('MongoDB connected');
+        app.listen(process.env.PORT || 5000, () =>
+          console.log(`Server running on port ${process.env.PORT || 5000}`)
+        );
+      })
+      .catch(err => {
+        console.error('DB connection error:', err);
+        app.listen(process.env.PORT || 5000, () =>
+          console.log(`Server running on port ${process.env.PORT || 5000} (DB connection pending)`)
+        );
+      });
+  } else {
     app.listen(process.env.PORT || 5000, () =>
-      console.log(`Server running on port ${process.env.PORT || 5000}`)
+      console.log(`Server running on port ${process.env.PORT || 5000} (MONGO_URI not set)`)
     );
-  })
-  .catch(err => console.error('DB connection error:', err));
+  }
+}
+
+module.exports = app;

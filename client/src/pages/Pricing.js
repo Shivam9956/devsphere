@@ -13,75 +13,78 @@ import PaymentBadges from '../components/PaymentBadges';
 
 const defaultPlans = [
   {
+    id: 'landing',
+    name: 'Landing Page',
+    priceUSD: 99,
+    priceINR: 4999,
+    delivery: '2-4 Days',
+    billingType: 'One Time',
+    desc: 'High-converting single-page website for ads, coaches, and lead generation.',
+    features: [
+      '1 Premium landing page',
+      'High-converting layout design',
+      'CTA & Lead capture forms',
+      'WhatsApp & CRM contact integration',
+      '15 days free support & bug fixes',
+      'Fast delivery (2-4 days)'
+    ],
+    color: '#06b6d4',
+    popular: false
+  },
+  {
     id: 'business',
     name: 'Business Website',
     priceUSD: 149,
     priceINR: 6999,
     delivery: '5-7 Days',
     billingType: 'One Time',
-    desc: 'Establish a powerful online presence for your business with a modern, professional and high-performing website.',
+    desc: 'Complete multi-page professional website to establish a strong online presence.',
     features: [
-      'Modern & Responsive Design',
-      'SEO Optimized',
-      'Contact & Inquiry Forms',
-      'Fast Loading Speed',
-      'Social Media Integration'
+      'Up to 8 custom responsive pages',
+      'Ideal for Gyms, Restaurants, Schools & Hospitals',
+      'Basic SEO optimization & Google Maps',
+      'Inquiry form & Lead capture',
+      '1 month developer support',
+      'Fast delivery (5-7 days)'
     ],
     color: '#3b82f6',
     popular: true
   },
   {
     id: 'ecommerce',
-    name: 'E-commerce Website',
+    name: 'E-commerce Store',
     priceUSD: 299,
     priceINR: 12999,
     delivery: '10-14 Days',
     billingType: 'One Time',
-    desc: 'Sell your products online with a secure, fast and feature-rich e-commerce website.',
+    desc: 'Fully-featured online store with payment gateways and inventory management.',
     features: [
-      'Product Catalog & Filters',
-      'Secure Payment Gateway',
-      'Order & Inventory Management',
-      'Mobile Responsive Design',
-      'Easy Admin Panel'
+      'Unlimited product catalog & filters',
+      'Secure payment gateways (Stripe, UPI, PayPal)',
+      'Order & inventory management dashboard',
+      'Automated invoice & order tracking',
+      '3 months priority developer support',
+      'Delivery in 10-14 days'
     ],
-    color: '#10b981',
-    popular: false
-  },
-  {
-    id: 'landing',
-    name: 'High-Converting Landing Page',
-    priceUSD: 99,
-    priceINR: 4999,
-    delivery: '2-4 Days',
-    billingType: 'One Time',
-    desc: 'Turn visitors into customers with laser-focused landing pages designed for maximum conversions.',
-    features: [
-      'Eye-Catching & Modern Design',
-      'Compelling Copywriting',
-      'CTA & Lead Capture Forms',
-      'A/B Testing Ready',
-      'Fast Loading & SEO Friendly'
-    ],
-    color: '#a855f7',
+    color: '#8b5cf6',
     popular: false
   },
   {
     id: 'maintenance',
-    name: 'Website Maintenance & SEO',
-    priceUSD: 69,
+    name: 'Maintenance & SEO',
+    priceUSD: 59,
     priceINR: 2999,
     delivery: 'Continuous Support',
     billingType: 'Monthly',
-    desc: 'Keep your website secure, updated, and ranking high on search engines with our ongoing support and SEO services.',
+    desc: 'Keep your website fast, updated, secure, and ranking high on search engines.',
     features: [
-      'Regular Updates & Backup',
-      'Bug Fixing & Security Monitoring',
-      'On-Page & Off-Page SEO',
-      'Performance Optimization',
-      'Monthly Reports'
+      'Unlimited content updates & bug fixes',
+      'Daily database backups & security scans',
+      'Performance optimization & speed tuning',
+      'Monthly SEO audit & keyword tracking',
+      'Priority developer support'
     ],
-    color: '#f59e0b',
+    color: '#10b981',
     popular: false
   }
 ];
@@ -127,7 +130,17 @@ export default function Pricing() {
     api.get('/plans')
       .then(res => {
         if (res.data && res.data.length > 0) {
-          setPlans(res.data);
+          const isOutdated = res.data.some(p => 
+            (p.id === 'business' && p.priceINR === 15000) || 
+            (p.id === 'ecommerce' && p.priceINR === 35000) || 
+            (p.id === 'landing' && p.priceINR === 8000) ||
+            (p.id === 'maintenance' && p.priceINR === 5000)
+          );
+          if (isOutdated) {
+            setPlans(defaultPlans);
+          } else {
+            setPlans(res.data);
+          }
         } else {
           setPlans(defaultPlans);
         }

@@ -303,19 +303,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .btn { padding: 10px 16px; font-size: 0.85rem; }
 }
 
-/* Pricing grid responsive */
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  align-items: stretch;
-}
 
-@media (max-width: 900px) {
-  .pricing-grid { grid-template-columns: 1fr !important; max-width: 480px !important; }
-}
 
 /* Contact grid responsive */
 .contact-grid {
@@ -461,9 +449,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto 40px;
+  gap: 16px;
+  max-width: 1240px;
+  margin: 0 auto 24px;
   align-items: stretch;
   width: 100%;
 }
@@ -471,6 +459,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 @media (max-width: 1100px) {
   .pricing-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
     max-width: 760px !important;
   }
 }
@@ -478,6 +467,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 @media (max-width: 680px) {
   .pricing-grid {
     grid-template-columns: 1fr !important;
+    gap: 16px !important;
     max-width: 440px !important;
     margin-left: auto !important;
     margin-right: auto !important;

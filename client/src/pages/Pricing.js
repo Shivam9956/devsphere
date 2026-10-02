@@ -219,62 +219,60 @@ export default function Pricing() {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="container section">
+    <div className="page-wrapper" style={{ paddingTop: 'calc(var(--nav-height) + 10px)' }}>
+      <div className="container" style={{ paddingBottom: '40px' }}>
 
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="section-title">Pricing Plans</h1>
-          <p className="section-subtitle">
+        {/* Compact Header */}
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <div className="section-tag" style={{ marginBottom: '8px', padding: '4px 14px', fontSize: '0.72rem' }}>
+            Transparent Pricing
+          </div>
+          <h1 className="section-title" style={{ fontSize: 'clamp(1.7rem, 2.5vw, 2.2rem)', marginBottom: '6px' }}>
+            Pricing Plans
+          </h1>
+          <p className="section-subtitle" style={{ fontSize: '0.88rem', margin: '0 auto 12px', maxWidth: '580px', lineHeight: 1.45 }}>
             Transparent, fixed pricing with no hidden charges. Pay securely via UPI, Cards, NetBanking, or PayPal.
           </p>
         </motion.div>
 
-        {/* Currency detected badge */}
-        {!currencyLoading && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}
-          >
+        {/* Compact Bar: Currency + Gateways */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          flexWrap: 'wrap',
+          marginBottom: '22px'
+        }}>
+          {!currencyLoading && (
             <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              padding: '8px 20px', borderRadius: '50px',
-              background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)',
-              fontSize: '0.85rem', color: 'var(--text2)'
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: '5px 14px', borderRadius: '50px',
+              background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.25)',
+              fontSize: '0.76rem', color: 'var(--text2)'
             }}>
-              <FiGlobe size={14} style={{ color: 'var(--accent)' }} />
-              Prices shown in <strong style={{ color: 'var(--accent)', marginLeft: 4 }}>
-                {currency.code} ({currency.symbol})
-              </strong>
-              &nbsp;— detected from your location
+              <FiGlobe size={12} style={{ color: 'var(--accent)' }} />
+              <span>Prices in <strong style={{ color: 'var(--accent)' }}>{currency.code} ({currency.symbol})</strong></span>
             </div>
-          </motion.div>
-        )}
+          )}
 
-        {/* Payment badges */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', marginBottom: '48px' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            {[
-              { icon: <SiRazorpay size={18} />, label: 'Razorpay', sub: 'UPI · Cards · NetBanking (India)', color: '#2d81f7' },
-              { icon: <SiPaypal size={18} />, label: 'PayPal', sub: 'International · Cards · Multi-Currency', color: '#003087' }
-            ].map((g, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderRadius: '50px', background: 'var(--card)', border: '1px solid var(--border)' }}>
-                <span style={{ color: g.color }}>{g.icon}</span>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{g.label}</div>
-                  <div style={{ color: 'var(--text2)', fontSize: '0.75rem' }}>{g.sub}</div>
-                </div>
-              </div>
-            ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '50px', background: 'var(--card)', border: '1px solid var(--border)', fontSize: '0.74rem' }}>
+              <span style={{ color: '#2d81f7', display: 'flex' }}><SiRazorpay size={13} /></span>
+              <span style={{ fontWeight: 600 }}>Razorpay</span>
+              <span style={{ color: 'var(--text3)', fontSize: '0.68rem' }}>(UPI / Cards / NetBanking)</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '50px', background: 'var(--card)', border: '1px solid var(--border)', fontSize: '0.74rem' }}>
+              <span style={{ color: '#0079C1', display: 'flex' }}><SiPaypal size={13} /></span>
+              <span style={{ fontWeight: 600 }}>PayPal</span>
+              <span style={{ color: 'var(--text3)', fontSize: '0.68rem' }}>(International / USD)</span>
+            </div>
           </div>
-
-          <PaymentBadges showText={true} align="center" />
         </div>
 
-        {/* Plans */}
+        {/* Plans Grid */}
         {loadingPlans ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
             <div className="spinner" />
           </div>
         ) : (
@@ -286,128 +284,136 @@ export default function Pricing() {
 
               return (
                 <motion.div key={plan.id || i}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ delay: i * 0.08 }}
                   style={{
                     background: 'var(--card)',
                     border: `1.5px solid ${isPopular ? cardColor : 'var(--border)'}`,
-                    borderRadius: '22px',
-                    padding: 'clamp(24px, 3vw, 32px)',
+                    borderRadius: '16px',
+                    padding: '18px 16px 16px',
                     position: 'relative',
-                    boxShadow: isPopular ? `0 20px 50px ${cardColor}25` : '0 10px 30px rgba(0,0,0,0.2)',
+                    boxShadow: isPopular ? `0 12px 35px ${cardColor}25` : '0 6px 20px rgba(0,0,0,0.25)',
                     transition: 'var(--transition)',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
                   }}
                 >
-                  {/* Top Bar: Icon & Popular Badge */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <div style={{
-                      width: 46, height: 46, borderRadius: '12px',
-                      background: `${cardColor}15`,
-                      border: `1px solid ${cardColor}30`,
-                      color: cardColor,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      {getPlanIcon(plan.id)}
+                  {/* Top section */}
+                  <div>
+                    {/* Top Bar: Icon & Popular Badge */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '10px',
+                        background: `${cardColor}15`,
+                        border: `1px solid ${cardColor}30`,
+                        color: cardColor,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        {getPlanIcon(plan.id)}
+                      </div>
+
+                      {isPopular && (
+                        <div style={{
+                          background: `linear-gradient(135deg, ${cardColor}, #8b5cf6)`,
+                          color: 'white',
+                          padding: '3px 10px',
+                          borderRadius: '50px',
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          boxShadow: `0 3px 10px ${cardColor}35`
+                        }}>
+                          👑 Most Popular
+                        </div>
+                      )}
                     </div>
 
-                    {isPopular && (
-                      <div style={{
-                        background: `linear-gradient(135deg, ${cardColor}, #8b5cf6)`,
-                        color: 'white',
-                        padding: '5px 14px',
-                        borderRadius: '50px',
-                        fontSize: '0.74rem',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        boxShadow: `0 4px 14px ${cardColor}40`
-                      }}>
-                        👑 Most Popular
-                      </div>
-                    )}
+                    <h3 style={{ fontSize: '1.08rem', fontWeight: 700, marginBottom: '4px', color: 'var(--text)', lineHeight: 1.25 }}>
+                      {plan.name}
+                    </h3>
+
+                    <p style={{ color: 'var(--text2)', fontSize: '0.78rem', marginBottom: '12px', lineHeight: 1.35, minHeight: '32px' }}>
+                      {plan.desc}
+                    </p>
+
+                    {/* Feature Checklist */}
+                    <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px', padding: 0 }}>
+                      {(plan.features || []).map((f, j) => (
+                        <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.79rem', color: 'var(--text)', lineHeight: 1.3 }}>
+                          <div style={{
+                            width: 15, height: 15, borderRadius: '50%',
+                            background: `${cardColor}18`,
+                            border: `1px solid ${cardColor}40`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <FiCheck size={9} style={{ color: cardColor }} />
+                          </div>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text)' }}>
-                    {plan.name}
-                  </h3>
-
-                  <p style={{ color: 'var(--text2)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: 1.5, minHeight: '40px' }}>
-                    {plan.desc}
-                  </p>
-
-                  {/* Feature Checklist */}
-                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px', flex: 1, padding: 0 }}>
-                    {(plan.features || []).map((f, j) => (
-                      <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.86rem', color: 'var(--text)' }}>
-                        <div style={{
-                          width: 18, height: 18, borderRadius: '50%',
-                          background: `${cardColor}18`,
-                          border: `1px solid ${cardColor}40`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
-                          <FiCheck size={10} style={{ color: cardColor }} />
-                        </div>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
 
                   {/* Price Block with "Starting from" & Billing Type */}
-                  <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border)', marginBottom: '18px' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text2)', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Starting from
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text)' }}>
-                        {currencyLoading ? '...' : getDisplayPrice(plan)}
-                      </span>
-                      <span style={{
-                        fontSize: '0.72rem', fontWeight: 600,
-                        padding: '3px 9px', borderRadius: '50px',
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: 'var(--text2)'
-                      }}>
-                        {billing}
-                      </span>
-                    </div>
-
-                    {/* Secondary approximate USD display */}
-                    {!currencyLoading && country === 'IN' && (
-                      <div style={{ color: 'var(--text2)', fontSize: '0.78rem', marginTop: '4px' }}>
-                        ≈ ${plan.priceUSD} USD {billing === 'Monthly' ? '/ month' : ''}
+                  <div style={{ marginTop: 'auto' }}>
+                    <div style={{ paddingTop: '10px', borderTop: '1px solid var(--border)', marginBottom: '10px' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text3)', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                        Starting from
                       </div>
-                    )}
-                  </div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '1.55rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                          {currencyLoading ? '...' : getDisplayPrice(plan)}
+                        </span>
+                        <span style={{
+                          fontSize: '0.68rem', fontWeight: 600,
+                          padding: '2px 7px', borderRadius: '50px',
+                          background: 'rgba(255,255,255,0.06)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          color: 'var(--text2)'
+                        }}>
+                          {billing}
+                        </span>
+                      </div>
 
-                  <button
-                    onClick={() => openModal(plan)}
-                    className="btn"
-                    style={{
-                      width: '100%', justifyContent: 'center',
-                      background: isPopular ? `linear-gradient(135deg, ${cardColor}, #8b5cf6)` : 'transparent',
-                      color: isPopular ? 'white' : 'var(--text)',
-                      border: `1.5px solid ${isPopular ? 'transparent' : 'var(--border)'}`,
-                      boxShadow: isPopular ? `0 6px 20px ${cardColor}40` : 'none',
-                      fontWeight: 700,
-                      padding: '12px'
-                    }}
-                  >
-                    Get Started
-                  </button>
+                      {/* Secondary approximate USD display */}
+                      {!currencyLoading && country === 'IN' && (
+                        <div style={{ color: 'var(--text3)', fontSize: '0.72rem', marginTop: '2px' }}>
+                          ≈ ${plan.priceUSD} USD {billing === 'Monthly' ? '/ mo' : ''}
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => openModal(plan)}
+                      className="btn"
+                      style={{
+                        width: '100%', justifyContent: 'center',
+                        background: isPopular ? `linear-gradient(135deg, ${cardColor}, #8b5cf6)` : 'transparent',
+                        color: isPopular ? 'white' : 'var(--text)',
+                        border: `1.5px solid ${isPopular ? 'transparent' : 'var(--border)'}`,
+                        boxShadow: isPopular ? `0 4px 14px ${cardColor}35` : 'none',
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        padding: '9px 12px',
+                        borderRadius: '10px'
+                      }}
+                    >
+                      Get Started
+                    </button>
+                  </div>
                 </motion.div>
               );
             })}
           </div>
         )}
 
-        <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: '0.88rem', marginTop: '40px' }}>
+        <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: '0.82rem', marginTop: '24px' }}>
           Need a custom enterprise solution or custom quote?{' '}
           <Link to="/contact" style={{ color: 'var(--accent)', fontWeight: 600 }}>Contact us</Link>
         </p>

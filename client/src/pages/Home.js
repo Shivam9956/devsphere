@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import CountUp from 'react-countup';
-import { FiArrowRight, FiDownload, FiCode, FiLayout, FiDatabase, FiSmartphone, FiZap, FiHeadphones, FiMail, FiMapPin, FiSend, FiClock, FiCheck, FiStar, FiShoppingCart, FiTarget, FiRefreshCw } from 'react-icons/fi';
+import { FiArrowRight, FiCode, FiZap, FiMail, FiMapPin, FiSend, FiCheck, FiStar, FiShoppingCart, FiTarget, FiRefreshCw, FiHeadphones, FiClock } from 'react-icons/fi';
 import { getIcon } from '../utils/iconMap';
 import { FaReact, FaNodeJs, FaWhatsapp } from 'react-icons/fa';
 import { SiMongodb, SiExpress, SiJavascript, SiTypescript, SiPython } from 'react-icons/si';
@@ -15,7 +15,7 @@ import TestimonialCard from '../components/TestimonialCard';
 import TestimonialForm from '../components/TestimonialForm';
 import AnimatedCodeBlock from '../components/AnimatedCodeBlock';
 import PaymentBadges from '../components/PaymentBadges';
-import Typewriter from '../components/Typewriter';
+import ServicesShowcase from '../components/ServicesShowcase';
 import './Home.css';
 
 const fadeUp = {
@@ -54,6 +54,7 @@ const techIcons = [
 export default function Home() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+
   const [testimonials, setTestimonials] = useState([]);
   const [services, setServices] = useState([]);
   const [selectedTestimonialFilter, setSelectedTestimonialFilter] = useState('All');
@@ -281,41 +282,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Services ── */}
-      <section className="section" style={{ background: 'var(--bg2)' }}>
-        <div className="container">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-              <div className="section-tag" style={{ display: 'inline-flex' }}>What We Do</div>
-            </div>
-            <h2 className="section-title">Services We Offer</h2>
-            <p className="section-subtitle">End-to-end web development solutions for your business</p>
-          </motion.div>
-
-          <div className="grid-4">
-            {services.map((s, i) => (
-              <motion.div
-                key={i}
-                className="card service-card"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                onClick={() => navigate('/services')}
-                style={{ cursor: 'pointer' }}
-                title="Click to view services"
-              >
-                <div className="service-icon">{s.icon && typeof s.icon === 'string' ? getIcon(s.icon) : (s.icon || getIcon('FiCode'))}</div>
-                <h3 style={{ marginBottom: '10px', fontWeight: 700, fontSize: '1rem' }}>{s.title}</h3>
-                <p style={{ color: 'var(--text2)', fontSize: '0.88rem', lineHeight: 1.7 }}>{s.desc || s.description}</p>
-                <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent)', fontSize: '0.82rem', fontWeight: 600 }}>
-                  Explore <FiArrowRight size={13} />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── Services Showcase (Ultra-Attractive Client Converting Design) ── */}
+      <ServicesShowcase showAnnotations={true} />
 
       {/* ── Our Process ── */}
       <section className="section" style={{ background: 'var(--bg)' }}>

@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaWhatsapp } from 'react-icons/fa';
-import { FiX } from 'react-icons/fi';
 
 const WHATSAPP_NUMBER = '918353949006';
 
 export default function WhatsAppButton() {
   const [showTooltip, setShowTooltip] = useState(false);
-
-  const handleClick = () => {
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20DevSphere%20Global!%20I%20visited%20your%20portfolio%20and%20I%27m%20interested%20in%20your%20services.`, '_blank');
-  };
 
   return (
     <div className="whatsapp-btn-wrapper" style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>

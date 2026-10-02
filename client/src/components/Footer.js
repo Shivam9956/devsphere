@@ -13,7 +13,7 @@ const socials = [
 ];
 const quickLinks = [
   ['Home', '/'], ['About', '/about'], ['Projects', '/projects'], ['Services', '/services'],
-  ['Pricing', '/pricing'], ['Blog', '/blog'], ['Contact', '/contact']
+  ['Pricing', '/pricing'], ['Blog', '/blog'], ['FAQ', '/faq'], ['Contact', '/contact']
 ];
 
 const services = [
@@ -130,6 +130,21 @@ export default function Footer() {
           <p style={{ color: 'var(--text3)', fontSize: '0.83rem' }}>
             © {new Date().getFullYear()} DevSphere Global. All rights reserved.
           </p>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <Link to="/privacy-policy" style={{ color: 'var(--text3)', fontSize: '0.83rem', transition: 'var(--transition)' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text3)'}
+            >
+              Privacy Policy
+            </Link>
+            <span style={{ color: 'var(--border2)' }}>·</span>
+            <Link to="/terms" style={{ color: 'var(--text3)', fontSize: '0.83rem', transition: 'var(--transition)' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text3)'}
+            >
+              Terms of Service
+            </Link>
+          </div>
           <p style={{ color: 'var(--text3)', fontSize: '0.83rem' }}>Crafted with Next.js & Node.js · Worldwide Agency</p>
         </div>
       </div>

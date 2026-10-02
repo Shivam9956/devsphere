@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiPrinter, FiArrowLeft } from 'react-icons/fi';
 import api from '../api/axios';
-import '../components/ProjectCard.css';
 
 export default function Invoice() {
   const { projectId } = useParams();

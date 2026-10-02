@@ -18,7 +18,7 @@ npm run dev
 ```bash
 cd client
 npm install
-cp src/.env.example src/.env
+cp .env.example .env
 # Fill in your .env values
 npm start
 ```
@@ -38,14 +38,23 @@ npm start
 | SMTP_USER | Your Gmail address |
 | SMTP_PASS | Gmail App Password |
 | ADMIN_EMAIL | Where contact emails are sent |
-| STRIPE_SECRET_KEY | Stripe secret key |
+| RAZORPAY_KEY_ID | Razorpay key ID |
+| RAZORPAY_KEY_SECRET | Razorpay key secret |
+| PAYPAL_CLIENT_ID | PayPal client ID |
+| PAYPAL_CLIENT_SECRET | PayPal client secret |
+| PAYPAL_MODE | PayPal mode (sandbox / live) |
+| GOOGLE_CLIENT_ID | Google OAuth client ID |
+| GOOGLE_CLIENT_SECRET | Google OAuth client secret |
 | CLIENT_URL | Frontend URL |
+| SERVER_URL | Backend URL |
 
 ### Client (.env)
 | Variable | Description |
 |---|---|
 | REACT_APP_API_URL | Backend API URL |
-| REACT_APP_STRIPE_PUBLIC_KEY | Stripe publishable key |
+| REACT_APP_GOOGLE_CLIENT_ID | Google OAuth client ID |
+| REACT_APP_PAYPAL_CLIENT_ID | PayPal client ID |
+| REACT_APP_RAZORPAY_KEY_ID | Razorpay key ID |
 
 ## Deployment
 
@@ -64,13 +73,13 @@ npm start
 ## Features
 - Home page with hero, skills, services, projects, testimonials
 - Projects page with category filter
-- Services page
-- Pricing page with Stripe payment
+- Services page & showcase
+- Pricing page with PayPal & Razorpay payments
 - Contact form with email notification
-- Client dashboard with project tracking
+- Client dashboard with project tracking & dynamic invoices
 - Admin panel (projects, clients, messages, testimonials)
 - Dark/Light mode
 - Fully responsive
 - WhatsApp floating button
-- JWT authentication
+- JWT authentication & Google OAuth
 - bcrypt password hashing

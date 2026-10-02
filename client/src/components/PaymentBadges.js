@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiLock, FiShield } from 'react-icons/fi';
+import { FiLock } from 'react-icons/fi';
 
 export default function PaymentBadges({ showText = true, align = 'center' }) {
   return (

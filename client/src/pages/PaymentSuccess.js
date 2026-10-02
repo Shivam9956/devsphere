@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiCheckCircle, FiArrowRight } from 'react-icons/fi';
@@ -6,12 +6,11 @@ import api from '../api/axios';
 
 export default function PaymentSuccess() {
   const [params] = useSearchParams();
-  const [verified, setVerified] = useState(false);
   const sessionId = params.get('session_id');
 
   useEffect(() => {
     if (sessionId) {
-      api.get(`/payments/verify/${sessionId}`).then(r => setVerified(r.data.success)).catch(() => {});
+      api.get(`/payments/verify/${sessionId}`).catch(() => {});
     }
   }, [sessionId]);
 

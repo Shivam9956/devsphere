@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiClock, FiCheckCircle, FiAlertCircle, FiRefreshCw, FiMessageSquare, FiPlus, FiSend, FiUser } from 'react-icons/fi';
+import { FiClock, FiCheckCircle, FiAlertCircle, FiRefreshCw, FiMessageSquare, FiSend, FiUser, FiPlus } from 'react-icons/fi';
 import api from '../api/axios';
 import { useAuth } from '../App';
 import toast from 'react-hot-toast';

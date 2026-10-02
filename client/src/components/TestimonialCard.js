@@ -102,13 +102,34 @@ export default function TestimonialCard({ testimonial }) {
         marginTop: 'auto'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {testimonial.avatar ? (
+            <img
+              src={testimonial.avatar}
+              alt={testimonial.name}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                if (e.currentTarget.nextElementSibling) {
+                  e.currentTarget.nextElementSibling.style.display = 'flex';
+                }
+              }}
+              style={{
+                width: 46,
+                height: 46,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: `2px solid ${theme.border}`,
+                flexShrink: 0,
+                boxShadow: `0 0 12px ${theme.primary}20`
+              }}
+            />
+          ) : null}
           <div style={{
             width: 44,
             height: 44,
             borderRadius: '50%',
             background: theme.bg,
             border: `2px solid ${theme.border}`,
-            display: 'flex',
+            display: testimonial.avatar ? 'none' : 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: theme.primary,

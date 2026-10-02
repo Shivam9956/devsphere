@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCheck, FiCopy, FiZap, FiShield, FiCpu, FiTerminal } from 'react-icons/fi';
+import { FiCheck, FiCopy, FiZap } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const SNIPPETS = [

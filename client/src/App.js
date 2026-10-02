@@ -5,7 +5,6 @@ import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
-import PageLoader from './components/PageLoader';
 import ScrollToTop from './components/ScrollToTop';
 import AuditModal from './components/AuditModal';
 
@@ -29,6 +28,9 @@ import BlogPost from './pages/BlogPost';
 import Invoice from './pages/Invoice';
 import About from './pages/About';
 import CostEstimator from './pages/CostEstimator';
+import FAQ from './pages/FAQ';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 
 export const ThemeContext = createContext();
 export const AuthContext = createContext();
@@ -63,6 +65,7 @@ function AppContent() {
         <Route path="/cost-estimator" element={<CostEstimator />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/login" element={<Login />} />
@@ -73,6 +76,8 @@ function AppContent() {
         <Route path="/projects/:id" element={<ProjectDetail />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/invoice/:projectId" element={
           <ProtectedRoute><Invoice /></ProtectedRoute>
         } />
@@ -97,7 +102,6 @@ export default function App() {
     try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
   });
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
-  const [loading, setLoading] = useState(false);
   const [isAuditOpen, setIsAuditOpen] = useState(false);
 
   const openAuditModal = () => setIsAuditOpen(true);
@@ -123,8 +127,6 @@ export default function App() {
   };
 
   const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
-
-  if (loading) return <PageLoader />;
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

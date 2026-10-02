@@ -32,7 +32,6 @@ export default function BlogPost() {
             <div key={i} style={{ height: 16, background: 'var(--border)', borderRadius: 4, marginBottom: '12px', width: i % 2 === 0 ? '90%' : '100%', animation: 'pulse 1.5s infinite' }} />
           ))}
         </div>
-        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
       </div>
     );
   }

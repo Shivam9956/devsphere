@@ -6,7 +6,6 @@ import {
   FiMapPin,
   FiCalendar,
   FiBriefcase,
-  FiAward,
   FiCheck,
   FiZap,
   FiExternalLink,

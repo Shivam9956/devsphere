@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiPlus, FiEdit2, FiTrash2, FiMail, FiUsers, FiFolder, FiMessageSquare, FiCheck, FiX, FiSend, FiStar, FiGlobe, FiPhone, FiExternalLink } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiMail, FiUsers, FiFolder, FiMessageSquare, FiCheck, FiX, FiSend, FiStar, FiGlobe, FiPhone, FiExternalLink, FiImage, FiUpload } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { iconGroups, getIcon } from '../utils/iconMap';
 import toast from 'react-hot-toast';
@@ -28,25 +28,26 @@ export default function AdminDashboard() {
   });
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [editProject, setEditProject] = useState(null);
+  const [projectForm, setProjectForm] = useState({ title: '', description: '', techStack: '', category: 'Web App', liveUrl: '', githubUrl: '', featured: false });
   const [showClientProjectForm, setShowClientProjectForm] = useState(false);
-  const [updateModal, setUpdateModal] = useState(null);
-  const [updateMsg, setUpdateMsg] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showBlogForm, setShowBlogForm] = useState(false);
-  const [editBlog, setEditBlog] = useState(null);
-  const [blogForm, setBlogForm] = useState({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false });
-  const [subscribers, setSubscribers] = useState([]);
-  const [showBroadcastForm, setShowBroadcastForm] = useState(false);
-  const [broadcastForm, setBroadcastForm] = useState({ subject: '', message: '' });
-
-  const [projectForm, setProjectForm] = useState({
-    title: '', description: '', techStack: '', category: 'Web App',
-    liveUrl: '', githubUrl: '', featured: false
-  });
-
   const [cpForm, setCpForm] = useState({
     client: '', title: '', description: '', status: 'Pending', paymentStatus: 'Unpaid', progress: 0, deadline: '', budget: ''
   });
+  const [updateModal, setUpdateModal] = useState(null);
+  const [updateMsg, setUpdateMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Blog states & Image upload
+  const [showBlogForm, setShowBlogForm] = useState(false);
+  const [editBlog, setEditBlog] = useState(null);
+  const [blogForm, setBlogForm] = useState({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false, image: '' });
+  const [blogImageFile, setBlogImageFile] = useState(null);
+  const [blogImagePreview, setBlogImagePreview] = useState('');
+
+  // Newsletter states
+  const [subscribers, setSubscribers] = useState([]);
+  const [showBroadcastForm, setShowBroadcastForm] = useState(false);
+  const [broadcastForm, setBroadcastForm] = useState({ subject: '', message: '' });
 
   // Support Tickets states
   const [supportTickets, setSupportTickets] = useState([]);
@@ -59,12 +60,15 @@ export default function AdminDashboard() {
   const [editPlan, setEditPlan] = useState(null);
   const [planForm, setPlanForm] = useState({ id: '', name: '', priceUSD: '', priceINR: '', desc: '', features: '', color: '#6366f1', popular: false, order: 0 });
 
-  // Testimonial states
+  // Testimonial states & Avatar upload
   const [showTestimonialForm, setShowTestimonialForm] = useState(false);
   const [editTestimonial, setEditTestimonial] = useState(null);
   const [testimonialForm, setTestimonialForm] = useState({
-    name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true
+    name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true, avatar: ''
   });
+  const [testimonialAvatarFile, setTestimonialAvatarFile] = useState(null);
+  const [testimonialAvatarPreview, setTestimonialAvatarPreview] = useState('');
+
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -76,7 +80,7 @@ export default function AdminDashboard() {
         api.get('/contact'),
         api.get('/testimonials/all'),
         api.get('/clients/users'),
-        api.get('/blog').catch(() => ({ data: [] })),
+        api.get('/blog/admin/all').catch(() => api.get('/blog')).catch(() => ({ data: [] })),
         api.get('/services-manage').catch(() => ({ data: [] })),
         api.get('/earnings').catch(() => ({ data: { earnings: [], stats: {} } })),
         api.get('/newsletter').catch(() => ({ data: [] })),
@@ -212,16 +216,33 @@ export default function AdminDashboard() {
     }
     setLoading(true);
     try {
+      const fd = new FormData();
+      fd.append('name', testimonialForm.name);
+      fd.append('role', testimonialForm.role || '');
+      fd.append('company', testimonialForm.company || '');
+      fd.append('country', testimonialForm.country || '');
+      fd.append('tag', testimonialForm.tag || 'Business Website');
+      fd.append('rating', testimonialForm.rating || 5);
+      fd.append('message', testimonialForm.message);
+      fd.append('approved', testimonialForm.approved !== false);
+      if (testimonialAvatarFile) {
+        fd.append('avatar', testimonialAvatarFile);
+      } else if (testimonialForm.avatar) {
+        fd.append('avatar', testimonialForm.avatar);
+      }
+
       if (editTestimonial) {
-        await api.put(`/testimonials/${editTestimonial._id}`, testimonialForm);
+        await api.put(`/testimonials/${editTestimonial._id}`, fd);
         toast.success('Testimonial updated successfully');
       } else {
-        await api.post('/testimonials/admin', testimonialForm);
+        await api.post('/testimonials/admin', fd);
         toast.success('Testimonial added successfully');
       }
       setShowTestimonialForm(false);
       setEditTestimonial(null);
-      setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true });
+      setTestimonialAvatarFile(null);
+      setTestimonialAvatarPreview('');
+      setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true, avatar: '' });
       fetchAll();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error saving testimonial');
@@ -239,16 +260,31 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     try {
+      const fd = new FormData();
+      fd.append('title', blogForm.title);
+      fd.append('slug', blogForm.slug);
+      fd.append('category', blogForm.category || 'Web Development');
+      fd.append('published', blogForm.published || false);
+      fd.append('excerpt', blogForm.excerpt);
+      fd.append('content', blogForm.content);
+      if (blogImageFile) {
+        fd.append('image', blogImageFile);
+      } else if (blogForm.image) {
+        fd.append('image', blogForm.image);
+      }
+
       if (editBlog) {
-        await api.put(`/blog/${editBlog._id}`, blogForm);
+        await api.put(`/blog/${editBlog._id}`, fd);
         toast.success('Blog updated');
       } else {
-        await api.post('/blog', blogForm);
+        await api.post('/blog', fd);
         toast.success('Blog created');
       }
       setShowBlogForm(false);
       setEditBlog(null);
-      setBlogForm({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false });
+      setBlogImageFile(null);
+      setBlogImagePreview('');
+      setBlogForm({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false, image: '' });
       fetchAll();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error');
@@ -1075,6 +1111,67 @@ export default function AdminDashboard() {
                       <option value={1}>⭐ (1 Star)</option>
                     </select>
                   </div>
+
+                  {/* Client Avatar / Photo Upload */}
+                  <div style={{ gridColumn: '1/-1', background: 'var(--bg2)', padding: '16px', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                      Client Photo / Avatar (Optional)
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                      {testimonialAvatarPreview ? (
+                        <div style={{ position: 'relative', width: 64, height: 64 }}>
+                          <img
+                            src={testimonialAvatarPreview}
+                            alt="Avatar Preview"
+                            style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTestimonialAvatarFile(null);
+                              setTestimonialAvatarPreview('');
+                              setTestimonialForm({ ...testimonialForm, avatar: '' });
+                            }}
+                            style={{
+                              position: 'absolute', top: -4, right: -4, width: 22, height: 22, borderRadius: '50%',
+                              background: 'var(--red)', color: '#fff', border: 'none', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px'
+                            }}
+                            title="Remove photo"
+                          >
+                            <FiX />
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{
+                          width: 64, height: 64, borderRadius: '50%', background: 'var(--card)',
+                          border: '2px dashed var(--border)', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', color: 'var(--text3)'
+                        }}>
+                          <FiUsers size={24} />
+                        </div>
+                      )}
+
+                      <div style={{ flex: 1, minWidth: '220px' }}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={e => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              setTestimonialAvatarFile(file);
+                              setTestimonialAvatarPreview(URL.createObjectURL(file));
+                            }
+                          }}
+                          style={{ padding: '8px' }}
+                        />
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginTop: '4px' }}>
+                          Upload real client profile photo (PNG, JPG, WEBP).
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div style={{ gridColumn: '1/-1' }}>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Client Review Message *</label>
                     <textarea
@@ -1104,7 +1201,12 @@ export default function AdminDashboard() {
                     <button
                       type="button"
                       className="btn btn-outline"
-                      onClick={() => { setShowTestimonialForm(false); setEditTestimonial(null); }}
+                      onClick={() => {
+                        setShowTestimonialForm(false);
+                        setEditTestimonial(null);
+                        setTestimonialAvatarFile(null);
+                        setTestimonialAvatarPreview('');
+                      }}
                     >
                       Cancel
                     </button>
@@ -1125,7 +1227,9 @@ export default function AdminDashboard() {
                   onClick={() => {
                     setShowTestimonialForm(true);
                     setEditTestimonial(null);
-                    setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true });
+                    setTestimonialAvatarFile(null);
+                    setTestimonialAvatarPreview('');
+                    setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true, avatar: '' });
                   }}
                 >
                   <FiPlus /> Add Your First Real Review
@@ -1135,27 +1239,44 @@ export default function AdminDashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {testimonials.map(t => (
                   <div key={t._id} className="card" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-                    <div style={{ flex: 1, minWidth: '280px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>{t.name}</span>
-                        {t.role && <span style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>• {t.role}</span>}
-                        {t.company && <span style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>at <strong>{t.company}</strong></span>}
-                        {t.country && <span style={{ fontSize: '0.85rem' }}>({t.country})</span>}
-                        <span className="badge" style={{ fontSize: '0.72rem', background: t.approved ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: t.approved ? 'var(--green)' : 'var(--yellow)', borderColor: t.approved ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)' }}>
-                          {t.approved ? '✓ Approved' : '⏳ Pending'}
-                        </span>
-                        {t.tag && (
-                          <span className="badge" style={{ fontSize: '0.72rem', background: 'rgba(99,102,241,0.1)', color: 'var(--accent)' }}>
-                            {t.tag}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flex: 1, minWidth: '280px' }}>
+                      {t.avatar ? (
+                        <img
+                          src={t.avatar}
+                          alt={t.name}
+                          style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)', flexShrink: 0 }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: 48, height: 48, borderRadius: '50%', background: 'rgba(99,102,241,0.12)',
+                          border: '2px solid rgba(99,102,241,0.25)', color: 'var(--accent)', fontWeight: 700,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '0.95rem'
+                        }}>
+                          {t.name ? t.name.slice(0, 2).toUpperCase() : '?'}
+                        </div>
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>{t.name}</span>
+                          {t.role && <span style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>• {t.role}</span>}
+                          {t.company && <span style={{ color: 'var(--text2)', fontSize: '0.85rem' }}>at <strong>{t.company}</strong></span>}
+                          {t.country && <span style={{ fontSize: '0.85rem' }}>({t.country})</span>}
+                          <span className="badge" style={{ fontSize: '0.72rem', background: t.approved ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: t.approved ? 'var(--green)' : 'var(--yellow)', borderColor: t.approved ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)' }}>
+                            {t.approved ? '✓ Approved' : '⏳ Pending'}
                           </span>
-                        )}
+                          {t.tag && (
+                            <span className="badge" style={{ fontSize: '0.72rem', background: 'rgba(99,102,241,0.1)', color: 'var(--accent)' }}>
+                              {t.tag}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '2px', color: '#f59e0b', marginBottom: '8px' }}>
+                          {[...Array(t.rating || 5)].map((_, i) => <FiStar key={i} size={14} style={{ fill: '#f59e0b', color: '#f59e0b' }} />)}
+                        </div>
+                        <p style={{ color: 'var(--text)', fontSize: '0.92rem', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>
+                          "{t.message}"
+                        </p>
                       </div>
-                      <div style={{ display: 'flex', gap: '2px', color: '#f59e0b', marginBottom: '8px' }}>
-                        {[...Array(t.rating || 5)].map((_, i) => <FiStar key={i} size={14} style={{ fill: '#f59e0b', color: '#f59e0b' }} />)}
-                      </div>
-                      <p style={{ color: 'var(--text)', fontSize: '0.92rem', lineHeight: 1.6, fontStyle: 'italic' }}>
-                        "{t.message}"
-                      </p>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <button
@@ -1170,8 +1291,11 @@ export default function AdminDashboard() {
                             tag: t.tag || 'Business Website',
                             rating: t.rating || 5,
                             message: t.message || '',
-                            approved: t.approved !== false
+                            approved: t.approved !== false,
+                            avatar: t.avatar || ''
                           });
+                          setTestimonialAvatarFile(null);
+                          setTestimonialAvatarPreview(t.avatar || '');
                           setShowTestimonialForm(true);
                         }}
                         title="Edit Testimonial"
@@ -1195,7 +1319,16 @@ export default function AdminDashboard() {
         {activeTab === 'Blog' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-              <button className="btn btn-primary" onClick={() => { setShowBlogForm(true); setEditBlog(null); setBlogForm({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false }); }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setShowBlogForm(true);
+                  setEditBlog(null);
+                  setBlogImageFile(null);
+                  setBlogImagePreview('');
+                  setBlogForm({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false, image: '' });
+                }}
+              >
                 <FiPlus /> New Post
               </button>
             </div>
@@ -1222,6 +1355,67 @@ export default function AdminDashboard() {
                     <input type="checkbox" id="published" checked={blogForm.published} onChange={e => setBlogForm({ ...blogForm, published: e.target.checked })} style={{ width: 'auto' }} />
                     <label htmlFor="published" style={{ fontSize: '0.9rem', cursor: 'pointer' }}>Published</label>
                   </div>
+
+                  {/* Blog Cover Image Upload */}
+                  <div style={{ gridColumn: '1/-1', background: 'var(--bg2)', padding: '16px', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                      Cover Image (Optional)
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                      {blogImagePreview ? (
+                        <div style={{ position: 'relative', width: 120, height: 72 }}>
+                          <img
+                            src={blogImagePreview}
+                            alt="Blog Cover Preview"
+                            style={{ width: 120, height: 72, borderRadius: '8px', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setBlogImageFile(null);
+                              setBlogImagePreview('');
+                              setBlogForm({ ...blogForm, image: '' });
+                            }}
+                            style={{
+                              position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: '50%',
+                              background: 'var(--red)', color: '#fff', border: 'none', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px'
+                            }}
+                            title="Remove image"
+                          >
+                            <FiX />
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{
+                          width: 120, height: 72, borderRadius: '8px', background: 'var(--card)',
+                          border: '2px dashed var(--border)', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', color: 'var(--text3)'
+                        }}>
+                          <FiImage size={24} />
+                        </div>
+                      )}
+
+                      <div style={{ flex: 1, minWidth: '220px' }}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={e => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              setBlogImageFile(file);
+                              setBlogImagePreview(URL.createObjectURL(file));
+                            }
+                          }}
+                          style={{ padding: '8px' }}
+                        />
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginTop: '4px' }}>
+                          Upload article banner / thumbnail image (PNG, JPG, WEBP).
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div style={{ gridColumn: '1/-1' }}>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem' }}>Excerpt *</label>
                     <textarea value={blogForm.excerpt} onChange={e => setBlogForm({ ...blogForm, excerpt: e.target.value })} rows={2} required />
@@ -1232,7 +1426,18 @@ export default function AdminDashboard() {
                   </div>
                   <div style={{ gridColumn: '1/-1', display: 'flex', gap: '12px' }}>
                     <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Saving...' : 'Save Post'}</button>
-                    <button type="button" className="btn btn-outline" onClick={() => { setShowBlogForm(false); setEditBlog(null); }}>Cancel</button>
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={() => {
+                        setShowBlogForm(false);
+                        setEditBlog(null);
+                        setBlogImageFile(null);
+                        setBlogImagePreview('');
+                      }}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </form>
               </motion.div>
@@ -1242,16 +1447,52 @@ export default function AdminDashboard() {
               {blogs.length === 0 && <div style={{ textAlign: 'center', color: 'var(--text2)', padding: '40px' }}>No blog posts yet</div>}
               {blogs.map(b => (
                 <div key={b._id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <div style={{ fontWeight: 600 }}>{b.title}</div>
-                    <div style={{ color: 'var(--text2)', fontSize: '0.85rem', marginTop: '4px' }}>
-                      {b.category} • {new Date(b.createdAt).toLocaleDateString()} •{' '}
-                      <span style={{ color: b.published ? 'var(--green)' : 'var(--yellow)' }}>{b.published ? 'Published' : 'Draft'}</span>
-                      {' '}• {b.views} views
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: '260px' }}>
+                    {b.image ? (
+                      <img
+                        src={b.image}
+                        alt={b.title}
+                        style={{ width: 68, height: 50, borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border)', flexShrink: 0 }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 68, height: 50, borderRadius: '8px', background: 'var(--bg2)',
+                        border: '1px solid var(--border)', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0
+                      }}>
+                        📝
+                      </div>
+                    )}
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{b.title}</div>
+                      <div style={{ color: 'var(--text2)', fontSize: '0.85rem', marginTop: '4px' }}>
+                        {b.category} • {new Date(b.createdAt).toLocaleDateString()} •{' '}
+                        <span style={{ color: b.published ? 'var(--green)' : 'var(--yellow)' }}>{b.published ? 'Published' : 'Draft'}</span>
+                        {' '}• {b.views} views
+                      </div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button className="icon-btn" onClick={() => { setEditBlog(b); setBlogForm({ title: b.title, slug: b.slug, excerpt: b.excerpt, content: b.content, category: b.category, published: b.published }); setShowBlogForm(true); }}><FiEdit2 /></button>
+                    <button
+                      className="icon-btn"
+                      onClick={() => {
+                        setEditBlog(b);
+                        setBlogForm({
+                          title: b.title || '',
+                          slug: b.slug || '',
+                          excerpt: b.excerpt || '',
+                          content: b.content || '',
+                          category: b.category || 'Web Development',
+                          published: b.published || false,
+                          image: b.image || ''
+                        });
+                        setBlogImageFile(null);
+                        setBlogImagePreview(b.image || '');
+                        setShowBlogForm(true);
+                      }}
+                    >
+                      <FiEdit2 />
+                    </button>
                     <button className="icon-btn" onClick={() => deleteBlog(b._id)} style={{ borderColor: 'var(--red)', color: 'var(--red)' }}><FiTrash2 /></button>
                   </div>
                 </div>

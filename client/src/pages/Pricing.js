@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCheck, FiZap, FiUser, FiMail, FiGlobe } from 'react-icons/fi';
+import { 
+  FiCheck, FiUser, FiMail, FiGlobe, FiZap, 
+  FiMonitor, FiShoppingCart, FiTarget, FiRefreshCw 
+} from 'react-icons/fi';
 import { SiRazorpay, SiPaypal } from 'react-icons/si';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -10,77 +13,93 @@ import PaymentBadges from '../components/PaymentBadges';
 
 const defaultPlans = [
   {
-    id: 'landing',
-    name: 'Landing Page',
-    priceUSD: 99,
-    priceINR: 8000,
-    delivery: '3-5 days',
-    desc: 'High-converting single-page website for ads and lead generation.',
-    features: [
-      '1 Premium landing page',
-      'High-converting layout design',
-      'Best for Coaching, SaaS & Real Estate',
-      'WhatsApp & CRM contact integration',
-      '15 days free support & bug fixes',
-      'Fast delivery (3-5 days)'
-    ],
-    color: '#06b6d4',
-    popular: false
-  },
-  {
     id: 'business',
     name: 'Business Website',
-    priceUSD: 189,
-    priceINR: 15000,
-    delivery: '7-10 days',
-    desc: 'Complete multi-page professional website for your business.',
+    priceUSD: 149,
+    priceINR: 6999,
+    delivery: '5-7 Days',
+    billingType: 'One Time',
+    desc: 'Establish a powerful online presence for your business with a modern, professional and high-performing website.',
     features: [
-      'Up to 8 custom responsive pages',
-      'Ideal for Gyms, Restaurants, Schools & Hospitals',
-      'Real Estate & Travel Agency features',
-      'Basic SEO optimization & Google Maps',
-      'Inquiry form & Lead capture',
-      '1 month developer support'
+      'Modern & Responsive Design',
+      'SEO Optimized',
+      'Contact & Inquiry Forms',
+      'Fast Loading Speed',
+      'Social Media Integration'
     ],
-    color: '#6366f1',
+    color: '#3b82f6',
     popular: true
   },
   {
     id: 'ecommerce',
-    name: 'E-commerce Store',
-    priceUSD: 429,
-    priceINR: 35000,
-    delivery: '2-3 weeks',
-    desc: 'Fully-featured online store with payment and product management.',
+    name: 'E-commerce Website',
+    priceUSD: 299,
+    priceINR: 12999,
+    delivery: '10-14 Days',
+    billingType: 'One Time',
+    desc: 'Sell your products online with a secure, fast and feature-rich e-commerce website.',
     features: [
-      'Unlimited product listings',
-      'Clothing, Electronics, Grocery stores',
-      'Secure payment gateways (Stripe, UPI)',
-      'Inventory & Order dashboard',
-      'Automated invoice generator',
-      '3 months priority support'
+      'Product Catalog & Filters',
+      'Secure Payment Gateway',
+      'Order & Inventory Management',
+      'Mobile Responsive Design',
+      'Easy Admin Panel'
     ],
-    color: '#8b5cf6',
+    color: '#10b981',
+    popular: false
+  },
+  {
+    id: 'landing',
+    name: 'High-Converting Landing Page',
+    priceUSD: 99,
+    priceINR: 4999,
+    delivery: '2-4 Days',
+    billingType: 'One Time',
+    desc: 'Turn visitors into customers with laser-focused landing pages designed for maximum conversions.',
+    features: [
+      'Eye-Catching & Modern Design',
+      'Compelling Copywriting',
+      'CTA & Lead Capture Forms',
+      'A/B Testing Ready',
+      'Fast Loading & SEO Friendly'
+    ],
+    color: '#a855f7',
     popular: false
   },
   {
     id: 'maintenance',
-    name: 'Maintenance & SEO',
-    priceUSD: 65,
-    priceINR: 5000,
-    delivery: 'Monthly',
-    desc: 'Keep your website fast, updated, secure and high-ranking.',
+    name: 'Website Maintenance & SEO',
+    priceUSD: 69,
+    priceINR: 2999,
+    delivery: 'Continuous Support',
+    billingType: 'Monthly',
+    desc: 'Keep your website secure, updated, and ranking high on search engines with our ongoing support and SEO services.',
     features: [
-      'Unlimited content updates & bug fixes',
-      'Daily database backups & security scans',
-      'Performance optimization & speed tuning',
-      'Monthly SEO audit & keyword tracking',
-      'Priority developer support'
+      'Regular Updates & Backup',
+      'Bug Fixing & Security Monitoring',
+      'On-Page & Off-Page SEO',
+      'Performance Optimization',
+      'Monthly Reports'
     ],
-    color: '#10b981',
+    color: '#f59e0b',
     popular: false
   }
 ];
+
+const getPlanIcon = (id) => {
+  switch (id) {
+    case 'business':
+      return <FiMonitor size={22} />;
+    case 'ecommerce':
+      return <FiShoppingCart size={22} />;
+    case 'landing':
+      return <FiTarget size={22} />;
+    case 'maintenance':
+      return <FiRefreshCw size={22} />;
+    default:
+      return <FiZap size={22} />;
+  }
+};
 
 // Razorpay script loader
 const loadRazorpayScript = () =>
@@ -207,7 +226,7 @@ export default function Pricing() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="section-title">Pricing Plans</h1>
           <p className="section-subtitle">
-            Transparent pricing. Pay securely via Razorpay (India) or PayPal (International).
+            Transparent, fixed pricing with no hidden charges. Pay securely via UPI, Cards, NetBanking, or PayPal.
           </p>
         </motion.div>
 
@@ -260,100 +279,140 @@ export default function Pricing() {
           </div>
         ) : (
           <div className="pricing-grid">
-            {plans.map((plan, i) => (
-            <motion.div key={plan.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              style={{
-                background: 'var(--card)',
-                border: `1.5px solid ${plan.popular ? plan.color : 'var(--border)'}`,
-                borderRadius: '22px',
-                padding: 'clamp(24px, 4vw, 36px) clamp(18px, 4vw, 32px)',
-                position: 'relative',
-                boxShadow: plan.popular ? `0 20px 60px ${plan.color}20` : 'none',
-                transition: 'var(--transition)',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              {plan.popular && (
-                <div style={{
-                  position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
-                  background: plan.color, color: 'white', padding: '4px 16px',
-                  borderRadius: '50px', fontSize: '0.75rem', fontWeight: 700,
-                  display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
-                }}>
-                  <FiZap size={12} /> Most Popular
-                </div>
-              )}
+            {plans.map((plan, i) => {
+              const cardColor = plan.color || '#3b82f6';
+              const isPopular = plan.popular;
+              const billing = plan.billingType || (plan.id === 'maintenance' ? 'Monthly' : 'One Time');
 
-              <div style={{ color: plan.color, fontSize: '0.8rem', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                {plan.name}
-              </div>
-
-              {/* Main price in local currency */}
-              <div style={{ marginBottom: '4px' }}>
-                <span style={{ fontSize: '2.4rem', fontWeight: 800 }}>
-                  {currencyLoading ? '...' : getDisplayPrice(plan)}
-                </span>
-              </div>
-
-              {/* Secondary price in USD (if not already USD) */}
-              {!currencyLoading && country !== 'IN' && currency.code !== 'USD' && (
-                <div style={{ color: 'var(--text2)', fontSize: '0.82rem', marginBottom: '8px' }}>
-                  ≈ ${plan.priceUSD} USD
-                </div>
-              )}
-              {!currencyLoading && country === 'IN' && (
-                <div style={{ color: 'var(--text2)', fontSize: '0.82rem', marginBottom: '8px' }}>
-                  ≈ ${plan.priceUSD} USD
-                </div>
-              )}
-
-              <p style={{ color: 'var(--text2)', fontSize: '0.88rem', marginBottom: '12px', lineHeight: 1.5 }}>{plan.desc}</p>
-              {plan.delivery && (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 10px', borderRadius: '50px', background: `${plan.color}12`, color: plan.color, fontSize: '0.75rem', fontWeight: 600, marginBottom: '20px' }}>
-                  ⚡ Delivery: {plan.delivery}
-                </div>
-              )}
-
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '11px', marginBottom: '28px', flex: 1 }}>
-                {plan.features.map((f, j) => (
-                  <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem', color: 'var(--text2)' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: `${plan.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <FiCheck size={11} style={{ color: plan.color }} />
+              return (
+                <motion.div key={plan.id || i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  style={{
+                    background: 'var(--card)',
+                    border: `1.5px solid ${isPopular ? cardColor : 'var(--border)'}`,
+                    borderRadius: '22px',
+                    padding: 'clamp(24px, 3vw, 32px)',
+                    position: 'relative',
+                    boxShadow: isPopular ? `0 20px 50px ${cardColor}25` : '0 10px 30px rgba(0,0,0,0.2)',
+                    transition: 'var(--transition)',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  {/* Top Bar: Icon & Popular Badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    <div style={{
+                      width: 46, height: 46, borderRadius: '12px',
+                      background: `${cardColor}15`,
+                      border: `1px solid ${cardColor}30`,
+                      color: cardColor,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      {getPlanIcon(plan.id)}
                     </div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
 
-              <button
-                onClick={() => openModal(plan)}
-                className="btn"
-                style={{
-                  width: '100%', justifyContent: 'center',
-                  background: plan.popular ? `linear-gradient(135deg, ${plan.color}, #06b6d4)` : 'transparent',
-                  color: plan.popular ? 'white' : 'var(--text)',
-                  border: `1.5px solid ${plan.popular ? 'transparent' : 'var(--border)'}`,
-                  boxShadow: plan.popular ? `0 4px 20px ${plan.color}35` : 'none',
-                  fontWeight: 600
-                }}
-              >
-                Get Started
-              </button>
-            </motion.div>
-          ))}
+                    {isPopular && (
+                      <div style={{
+                        background: `linear-gradient(135deg, ${cardColor}, #8b5cf6)`,
+                        color: 'white',
+                        padding: '5px 14px',
+                        borderRadius: '50px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        boxShadow: `0 4px 14px ${cardColor}40`
+                      }}>
+                        👑 Most Popular
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text)' }}>
+                    {plan.name}
+                  </h3>
+
+                  <p style={{ color: 'var(--text2)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: 1.5, minHeight: '40px' }}>
+                    {plan.desc}
+                  </p>
+
+                  {/* Feature Checklist */}
+                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px', flex: 1, padding: 0 }}>
+                    {(plan.features || []).map((f, j) => (
+                      <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.86rem', color: 'var(--text)' }}>
+                        <div style={{
+                          width: 18, height: 18, borderRadius: '50%',
+                          background: `${cardColor}18`,
+                          border: `1px solid ${cardColor}40`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <FiCheck size={10} style={{ color: cardColor }} />
+                        </div>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Price Block with "Starting from" & Billing Type */}
+                  <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border)', marginBottom: '18px' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text2)', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Starting from
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text)' }}>
+                        {currencyLoading ? '...' : getDisplayPrice(plan)}
+                      </span>
+                      <span style={{
+                        fontSize: '0.72rem', fontWeight: 600,
+                        padding: '3px 9px', borderRadius: '50px',
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: 'var(--text2)'
+                      }}>
+                        {billing}
+                      </span>
+                    </div>
+
+                    {/* Secondary approximate USD display */}
+                    {!currencyLoading && country === 'IN' && (
+                      <div style={{ color: 'var(--text2)', fontSize: '0.78rem', marginTop: '4px' }}>
+                        ≈ ${plan.priceUSD} USD {billing === 'Monthly' ? '/ month' : ''}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => openModal(plan)}
+                    className="btn"
+                    style={{
+                      width: '100%', justifyContent: 'center',
+                      background: isPopular ? `linear-gradient(135deg, ${cardColor}, #8b5cf6)` : 'transparent',
+                      color: isPopular ? 'white' : 'var(--text)',
+                      border: `1.5px solid ${isPopular ? 'transparent' : 'var(--border)'}`,
+                      boxShadow: isPopular ? `0 6px 20px ${cardColor}40` : 'none',
+                      fontWeight: 700,
+                      padding: '12px'
+                    }}
+                  >
+                    Get Started
+                  </button>
+                </motion.div>
+              );
+            })}
           </div>
         )}
 
-        <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: '0.88rem' }}>
-          Need a custom quote?{' '}
-          <Link to="/contact" style={{ color: 'var(--accent)' }}>Contact us</Link>
+        <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: '0.88rem', marginTop: '40px' }}>
+          Need a custom enterprise solution or custom quote?{' '}
+          <Link to="/contact" style={{ color: 'var(--accent)', fontWeight: 600 }}>Contact us</Link>
         </p>
       </div>
+
 
       {/* Payment Modal */}
       <AnimatePresence>

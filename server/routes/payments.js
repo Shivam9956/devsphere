@@ -3,28 +3,14 @@ const router = express.Router();
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const paypal = require('@paypal/checkout-server-sdk');
-
-// ── Stripe (existing) ──────────────────────────────────────────────────────
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Plan = require('../models/Plan');
 
 const planPrices = {
-  basic:     { amount: 299,  name: 'Basic Website' },
-  advanced:  { amount: 799,  name: 'Advanced Website' },
-  fullstack: { amount: 1499, name: 'Full Stack App' },
-  marketing: { amount: 199,  name: 'Digital Marketing' }
+  business:    { amount: 149, name: 'Business Website' },
+  ecommerce:   { amount: 299, name: 'E-commerce Website' },
+  landing:     { amount: 99,  name: 'High-Converting Landing Page' },
+  maintenance: { amount: 69,  name: 'Website Maintenance & SEO' }
 };
-
-// Stripe checkout (Disabled)
-router.post('/create-session', async (req, res) => {
-  return res.status(400).json({ message: 'Stripe payment is disabled' });
-});
-
-// Verify Stripe session (Disabled)
-router.get('/verify/:sessionId', async (req, res) => {
-  return res.status(400).json({ message: 'Stripe payment is disabled' });
-});
-
 
 // ── Razorpay ───────────────────────────────────────────────────────────────
 const getRazorpay = () => new Razorpay({

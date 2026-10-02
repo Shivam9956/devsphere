@@ -8,6 +8,7 @@ const planSchema = new mongoose.Schema({
   desc: { type: String },
   features: [{ type: String }],
   delivery: { type: String },
+  billingType: { type: String, default: 'One Time' },
   color: { type: String, default: '#6366f1' },
   popular: { type: Boolean, default: false },
   order: { type: Number, default: 0 }

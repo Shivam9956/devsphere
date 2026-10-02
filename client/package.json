@@ -6,6 +6,8 @@
     "@paypal/react-paypal-js": "^9.1.1",
     "axios": "^1.4.0",
     "framer-motion": "^10.13.0",
+    "mongoose": "^9.10.3",
+    "nodemailer": "^10.0.13",
     "react": "^18.2.0",
     "react-countup": "^6.4.2",
     "react-dom": "^18.2.0",

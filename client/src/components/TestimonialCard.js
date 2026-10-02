@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiStar, FiCheckCircle } from 'react-icons/fi';
 import { FaQuoteLeft } from 'react-icons/fa';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function TestimonialCard({ testimonial }) {
   const initials = testimonial.name
@@ -104,7 +105,7 @@ export default function TestimonialCard({ testimonial }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {testimonial.avatar ? (
             <img
-              src={testimonial.avatar}
+              src={getImageUrl(testimonial.avatar)}
               alt={testimonial.name}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';

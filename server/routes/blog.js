@@ -15,7 +15,21 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => cb(null, `blog_${Date.now()}${path.extname(file.originalname)}`)
 });
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+const fileFilter = (req, file, cb) => {
+  const allowed = /\.(jpeg|jpg|png|webp)$/i;
+  const isAllowedExt = allowed.test(path.extname(file.originalname).toLowerCase());
+  const isAllowedMime = /image\/(jpeg|jpg|png|webp)/i.test(file.mimetype);
+  if (isAllowedExt || isAllowedMime) {
+    return cb(null, true);
+  }
+  cb(new Error('Only PNG, JPG, JPEG, and WEBP image formats are supported!'));
+};
+
+const upload = multer({ 
+  storage, 
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter 
+});
 
 // GET /api/blog — all published blogs (public)
 router.get('/', async (req, res) => {

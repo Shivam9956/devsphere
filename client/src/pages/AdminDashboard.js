@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FiPlus, FiEdit2, FiTrash2, FiMail, FiUsers, FiFolder, FiMessageSquare, FiCheck, FiX, FiSend, FiStar, FiGlobe, FiPhone, FiExternalLink, FiImage, FiUpload } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { iconGroups, getIcon } from '../utils/iconMap';
+import { getImageUrl } from '../utils/imageUrl';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
 
@@ -42,7 +43,10 @@ export default function AdminDashboard() {
   const [editBlog, setEditBlog] = useState(null);
   const [blogForm, setBlogForm] = useState({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false, image: '' });
   const [blogImageFile, setBlogImageFile] = useState(null);
+  const [blogImageFileName, setBlogImageFileName] = useState('');
   const [blogImagePreview, setBlogImagePreview] = useState('');
+  const [blogImageLoadError, setBlogImageLoadError] = useState(false);
+  const blogFileInputRef = useRef(null);
 
   // Newsletter states
   const [subscribers, setSubscribers] = useState([]);
@@ -67,7 +71,10 @@ export default function AdminDashboard() {
     name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true, avatar: ''
   });
   const [testimonialAvatarFile, setTestimonialAvatarFile] = useState(null);
+  const [testimonialAvatarFileName, setTestimonialAvatarFileName] = useState('');
   const [testimonialAvatarPreview, setTestimonialAvatarPreview] = useState('');
+  const [testimonialAvatarLoadError, setTestimonialAvatarLoadError] = useState(false);
+  const testimonialAvatarInputRef = useRef(null);
 
 
   useEffect(() => { fetchAll(); }, []);
@@ -209,6 +216,50 @@ export default function AdminDashboard() {
     fetchAll();
   };
 
+  const handleTestimonialAvatarSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const validExts = ['png', 'jpg', 'jpeg', 'webp'];
+
+    if (!validTypes.includes(file.type) && !validExts.includes(fileExt)) {
+      toast.error('Please select a PNG, JPG, JPEG, or WEBP image');
+      if (testimonialAvatarInputRef.current) testimonialAvatarInputRef.current.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Avatar size must be under 5MB');
+      if (testimonialAvatarInputRef.current) testimonialAvatarInputRef.current.value = '';
+      return;
+    }
+
+    setTestimonialAvatarFile(file);
+    setTestimonialAvatarFileName(file.name);
+    setTestimonialAvatarLoadError(false);
+
+    try {
+      setTestimonialAvatarPreview(URL.createObjectURL(file));
+    } catch {
+      const reader = new FileReader();
+      reader.onloadend = () => setTestimonialAvatarPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveTestimonialAvatar = () => {
+    setTestimonialAvatarFile(null);
+    setTestimonialAvatarFileName('');
+    setTestimonialAvatarPreview('');
+    setTestimonialAvatarLoadError(false);
+    setTestimonialForm(prev => ({ ...prev, avatar: '' }));
+    if (testimonialAvatarInputRef.current) {
+      testimonialAvatarInputRef.current.value = '';
+    }
+  };
+
   const handleTestimonialSubmit = async e => {
     e.preventDefault();
     if (!testimonialForm.name || !testimonialForm.message) {
@@ -227,8 +278,8 @@ export default function AdminDashboard() {
       fd.append('approved', testimonialForm.approved !== false);
       if (testimonialAvatarFile) {
         fd.append('avatar', testimonialAvatarFile);
-      } else if (testimonialForm.avatar) {
-        fd.append('avatar', testimonialForm.avatar);
+      } else {
+        fd.append('avatar', testimonialForm.avatar || '');
       }
 
       if (editTestimonial) {
@@ -241,7 +292,12 @@ export default function AdminDashboard() {
       setShowTestimonialForm(false);
       setEditTestimonial(null);
       setTestimonialAvatarFile(null);
+      setTestimonialAvatarFileName('');
       setTestimonialAvatarPreview('');
+      setTestimonialAvatarLoadError(false);
+      if (testimonialAvatarInputRef.current) {
+        testimonialAvatarInputRef.current.value = '';
+      }
       setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true, avatar: '' });
       fetchAll();
     } catch (err) {
@@ -254,6 +310,50 @@ export default function AdminDashboard() {
   const markRead = async (id) => {
     await api.put(`/contact/${id}/read`);
     fetchAll();
+  };
+
+  const handleBlogImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const validExts = ['png', 'jpg', 'jpeg', 'webp'];
+
+    if (!validTypes.includes(file.type) && !validExts.includes(fileExt)) {
+      toast.error('Please select a valid PNG, JPG, JPEG, or WEBP image');
+      if (blogFileInputRef.current) blogFileInputRef.current.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Cover image size must be under 5MB');
+      if (blogFileInputRef.current) blogFileInputRef.current.value = '';
+      return;
+    }
+
+    setBlogImageFile(file);
+    setBlogImageFileName(file.name);
+    setBlogImageLoadError(false);
+
+    try {
+      setBlogImagePreview(URL.createObjectURL(file));
+    } catch {
+      const reader = new FileReader();
+      reader.onloadend = () => setBlogImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveBlogImage = () => {
+    setBlogImageFile(null);
+    setBlogImageFileName('');
+    setBlogImagePreview('');
+    setBlogImageLoadError(false);
+    setBlogForm(prev => ({ ...prev, image: '' }));
+    if (blogFileInputRef.current) {
+      blogFileInputRef.current.value = '';
+    }
   };
 
   const handleBlogSubmit = async e => {
@@ -269,25 +369,30 @@ export default function AdminDashboard() {
       fd.append('content', blogForm.content);
       if (blogImageFile) {
         fd.append('image', blogImageFile);
-      } else if (blogForm.image) {
-        fd.append('image', blogForm.image);
+      } else {
+        fd.append('image', blogForm.image || '');
       }
 
       if (editBlog) {
         await api.put(`/blog/${editBlog._id}`, fd);
-        toast.success('Blog updated');
+        toast.success('Blog updated successfully');
       } else {
         await api.post('/blog', fd);
-        toast.success('Blog created');
+        toast.success('Blog created successfully');
       }
       setShowBlogForm(false);
       setEditBlog(null);
       setBlogImageFile(null);
+      setBlogImageFileName('');
       setBlogImagePreview('');
+      setBlogImageLoadError(false);
+      if (blogFileInputRef.current) {
+        blogFileInputRef.current.value = '';
+      }
       setBlogForm({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false, image: '' });
       fetchAll();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Error');
+      toast.error(err.response?.data?.message || 'Error saving blog post');
     } finally {
       setLoading(false);
     }
@@ -1113,28 +1218,25 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Client Avatar / Photo Upload */}
-                  <div style={{ gridColumn: '1/-1', background: 'var(--bg2)', padding: '16px', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                  <div style={{ gridColumn: '1/-1', background: 'var(--bg2)', padding: '16px 20px', borderRadius: '14px', border: '1px dashed var(--border)' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
                       Client Photo / Avatar (Optional)
                     </label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                      {testimonialAvatarPreview ? (
-                        <div style={{ position: 'relative', width: 64, height: 64 }}>
+                      {testimonialAvatarPreview && !testimonialAvatarLoadError ? (
+                        <div style={{ position: 'relative', width: 64, height: 64, flexShrink: 0 }}>
                           <img
                             src={testimonialAvatarPreview}
                             alt="Avatar Preview"
-                            style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                            onError={() => setTestimonialAvatarLoadError(true)}
+                            style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)', display: 'block' }}
                           />
                           <button
                             type="button"
-                            onClick={() => {
-                              setTestimonialAvatarFile(null);
-                              setTestimonialAvatarPreview('');
-                              setTestimonialForm({ ...testimonialForm, avatar: '' });
-                            }}
+                            onClick={handleRemoveTestimonialAvatar}
                             style={{
                               position: 'absolute', top: -4, right: -4, width: 22, height: 22, borderRadius: '50%',
-                              background: 'var(--red)', color: '#fff', border: 'none', cursor: 'pointer',
+                              background: '#ef4444', color: '#fff', border: '2px solid var(--card)', cursor: 'pointer',
                               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px'
                             }}
                             title="Remove photo"
@@ -1146,7 +1248,7 @@ export default function AdminDashboard() {
                         <div style={{
                           width: 64, height: 64, borderRadius: '50%', background: 'var(--card)',
                           border: '2px dashed var(--border)', display: 'flex', alignItems: 'center',
-                          justifyContent: 'center', color: 'var(--text3)'
+                          justifyContent: 'center', color: 'var(--text3)', flexShrink: 0
                         }}>
                           <FiUsers size={24} />
                         </div>
@@ -1154,20 +1256,29 @@ export default function AdminDashboard() {
 
                       <div style={{ flex: 1, minWidth: '220px' }}>
                         <input
+                          ref={testimonialAvatarInputRef}
                           type="file"
-                          accept="image/*"
-                          onChange={e => {
-                            const file = e.target.files[0];
-                            if (file) {
-                              setTestimonialAvatarFile(file);
-                              setTestimonialAvatarPreview(URL.createObjectURL(file));
-                            }
-                          }}
-                          style={{ padding: '8px' }}
+                          accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                          onChange={handleTestimonialAvatarSelect}
+                          style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%' }}
                         />
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginTop: '4px' }}>
-                          Upload real client profile photo (PNG, JPG, WEBP).
-                        </div>
+                        {testimonialAvatarFileName ? (
+                          <div style={{ fontSize: '0.78rem', color: 'var(--accent)', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <FiCheck size={13} style={{ color: 'var(--green)' }} />
+                            <span>File: <strong>{testimonialAvatarFileName}</strong></span>
+                            <button
+                              type="button"
+                              onClick={handleRemoveTestimonialAvatar}
+                              style={{ background: 'none', border: 'none', color: 'var(--red)', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginTop: '4px' }}>
+                            Upload real client profile photo (PNG, JPG, JPEG, WEBP · Max 5MB).
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1205,7 +1316,10 @@ export default function AdminDashboard() {
                         setShowTestimonialForm(false);
                         setEditTestimonial(null);
                         setTestimonialAvatarFile(null);
+                        setTestimonialAvatarFileName('');
                         setTestimonialAvatarPreview('');
+                        setTestimonialAvatarLoadError(false);
+                        if (testimonialAvatarInputRef.current) testimonialAvatarInputRef.current.value = '';
                       }}
                     >
                       Cancel
@@ -1228,7 +1342,10 @@ export default function AdminDashboard() {
                     setShowTestimonialForm(true);
                     setEditTestimonial(null);
                     setTestimonialAvatarFile(null);
+                    setTestimonialAvatarFileName('');
                     setTestimonialAvatarPreview('');
+                    setTestimonialAvatarLoadError(false);
+                    if (testimonialAvatarInputRef.current) testimonialAvatarInputRef.current.value = '';
                     setTestimonialForm({ name: '', role: '', company: '', country: '', tag: 'Business Website', rating: 5, message: '', approved: true, avatar: '' });
                   }}
                 >
@@ -1242,8 +1359,9 @@ export default function AdminDashboard() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flex: 1, minWidth: '280px' }}>
                       {t.avatar ? (
                         <img
-                          src={t.avatar}
+                          src={getImageUrl(t.avatar)}
                           alt={t.name}
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)', flexShrink: 0 }}
                         />
                       ) : (
@@ -1295,7 +1413,10 @@ export default function AdminDashboard() {
                             avatar: t.avatar || ''
                           });
                           setTestimonialAvatarFile(null);
-                          setTestimonialAvatarPreview(t.avatar || '');
+                          setTestimonialAvatarFileName(t.avatar ? t.avatar.split('/').pop() : '');
+                          setTestimonialAvatarPreview(t.avatar ? getImageUrl(t.avatar) : '');
+                          setTestimonialAvatarLoadError(false);
+                          if (testimonialAvatarInputRef.current) testimonialAvatarInputRef.current.value = '';
                           setShowTestimonialForm(true);
                         }}
                         title="Edit Testimonial"
@@ -1325,7 +1446,10 @@ export default function AdminDashboard() {
                   setShowBlogForm(true);
                   setEditBlog(null);
                   setBlogImageFile(null);
+                  setBlogImageFileName('');
                   setBlogImagePreview('');
+                  setBlogImageLoadError(false);
+                  if (blogFileInputRef.current) blogFileInputRef.current.value = '';
                   setBlogForm({ title: '', slug: '', excerpt: '', content: '', category: 'Web Development', published: false, image: '' });
                 }}
               >
@@ -1357,29 +1481,46 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Blog Cover Image Upload */}
-                  <div style={{ gridColumn: '1/-1', background: 'var(--bg2)', padding: '16px', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                  <div style={{ gridColumn: '1/-1', background: 'var(--bg2)', padding: '16px 20px', borderRadius: '14px', border: '1px dashed var(--border)' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
                       Cover Image (Optional)
                     </label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                      {blogImagePreview ? (
-                        <div style={{ position: 'relative', width: 120, height: 72 }}>
+                      {blogImagePreview && !blogImageLoadError ? (
+                        <div style={{ position: 'relative', width: 130, height: 78, flexShrink: 0 }}>
                           <img
                             src={blogImagePreview}
                             alt="Blog Cover Preview"
-                            style={{ width: 120, height: 72, borderRadius: '8px', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                            onError={() => setBlogImageLoadError(true)}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              borderRadius: '10px',
+                              objectFit: 'cover',
+                              border: '2px solid var(--accent)',
+                              background: 'var(--card)',
+                              display: 'block'
+                            }}
                           />
                           <button
                             type="button"
-                            onClick={() => {
-                              setBlogImageFile(null);
-                              setBlogImagePreview('');
-                              setBlogForm({ ...blogForm, image: '' });
-                            }}
+                            onClick={handleRemoveBlogImage}
                             style={{
-                              position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: '50%',
-                              background: 'var(--red)', color: '#fff', border: 'none', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px'
+                              position: 'absolute',
+                              top: -6,
+                              right: -6,
+                              width: 22,
+                              height: 22,
+                              borderRadius: '50%',
+                              background: '#ef4444',
+                              color: '#fff',
+                              border: '2px solid var(--card)',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.4)'
                             }}
                             title="Remove image"
                           >
@@ -1388,30 +1529,41 @@ export default function AdminDashboard() {
                         </div>
                       ) : (
                         <div style={{
-                          width: 120, height: 72, borderRadius: '8px', background: 'var(--card)',
-                          border: '2px dashed var(--border)', display: 'flex', alignItems: 'center',
-                          justifyContent: 'center', color: 'var(--text3)'
+                          width: 130, height: 78, borderRadius: '10px', background: 'var(--card)',
+                          border: '2px dashed var(--border)', display: 'flex', flexDirection: 'column',
+                          alignItems: 'center', justifyContent: 'center', color: 'var(--text3)',
+                          gap: '4px', flexShrink: 0
                         }}>
-                          <FiImage size={24} />
+                          <FiImage size={24} style={{ opacity: 0.6 }} />
+                          <span style={{ fontSize: '0.68rem', color: 'var(--text3)' }}>No image</span>
                         </div>
                       )}
 
                       <div style={{ flex: 1, minWidth: '220px' }}>
                         <input
+                          ref={blogFileInputRef}
                           type="file"
-                          accept="image/*"
-                          onChange={e => {
-                            const file = e.target.files[0];
-                            if (file) {
-                              setBlogImageFile(file);
-                              setBlogImagePreview(URL.createObjectURL(file));
-                            }
-                          }}
-                          style={{ padding: '8px' }}
+                          accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                          onChange={handleBlogImageSelect}
+                          style={{ padding: '8px 12px', fontSize: '0.85rem', width: '100%' }}
                         />
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginTop: '4px' }}>
-                          Upload article banner / thumbnail image (PNG, JPG, WEBP).
-                        </div>
+                        {blogImageFileName ? (
+                          <div style={{ fontSize: '0.78rem', color: 'var(--accent)', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <FiCheck size={13} style={{ color: 'var(--green)' }} />
+                            <span>File: <strong>{blogImageFileName}</strong></span>
+                            <button
+                              type="button"
+                              onClick={handleRemoveBlogImage}
+                              style={{ background: 'none', border: 'none', color: 'var(--red)', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text3)', marginTop: '6px' }}>
+                            Upload article banner / thumbnail image (PNG, JPG, JPEG, WEBP · Max 5MB).
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1433,7 +1585,10 @@ export default function AdminDashboard() {
                         setShowBlogForm(false);
                         setEditBlog(null);
                         setBlogImageFile(null);
+                        setBlogImageFileName('');
                         setBlogImagePreview('');
+                        setBlogImageLoadError(false);
+                        if (blogFileInputRef.current) blogFileInputRef.current.value = '';
                       }}
                     >
                       Cancel
@@ -1450,8 +1605,9 @@ export default function AdminDashboard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: '260px' }}>
                     {b.image ? (
                       <img
-                        src={b.image}
+                        src={getImageUrl(b.image)}
                         alt={b.title}
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         style={{ width: 68, height: 50, borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border)', flexShrink: 0 }}
                       />
                     ) : (
@@ -1487,7 +1643,10 @@ export default function AdminDashboard() {
                           image: b.image || ''
                         });
                         setBlogImageFile(null);
-                        setBlogImagePreview(b.image || '');
+                        setBlogImageFileName(b.image ? b.image.split('/').pop() : '');
+                        setBlogImagePreview(b.image ? getImageUrl(b.image) : '');
+                        setBlogImageLoadError(false);
+                        if (blogFileInputRef.current) blogFileInputRef.current.value = '';
                         setShowBlogForm(true);
                       }}
                     >

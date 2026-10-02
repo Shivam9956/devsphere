@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiCalendar, FiEye, FiClock, FiTag } from 'react-icons/fi';
 import api from '../api/axios';
+import { getImageUrl } from '../utils/imageUrl';
 import NewsletterBanner from '../components/NewsletterBanner';
 
 const fadeUp = {
@@ -64,12 +65,25 @@ export default function Blog() {
             {blogs.map(blog => (
               <motion.div key={blog._id} variants={fadeUp} className="card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 {blog.image ? (
-                  <img src={blog.image} alt={blog.title} style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: '8px', marginBottom: '16px' }} />
-                ) : (
-                  <div style={{ height: 200, background: 'var(--gradient)', borderRadius: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
-                    📝
-                  </div>
-                )}
+                  <img
+                    src={getImageUrl(blog.image)}
+                    alt={blog.title}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      if (e.currentTarget.nextSibling) {
+                        e.currentTarget.nextSibling.style.display = 'flex';
+                      }
+                    }}
+                    style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: '8px', marginBottom: '16px' }}
+                  />
+                ) : null}
+                <div style={{
+                  height: 200, background: 'var(--gradient)', borderRadius: '8px',
+                  marginBottom: '16px', display: blog.image ? 'none' : 'flex',
+                  alignItems: 'center', justifyContent: 'center', fontSize: '3rem'
+                }}>
+                  📝
+                </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                     <span style={{ background: 'rgba(99,102,241,0.12)', color: 'var(--accent)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '20px', padding: '3px 10px', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>

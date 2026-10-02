@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FiArrowLeft, FiCalendar, FiEye, FiShare2, FiTag } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -84,7 +85,12 @@ export default function BlogPost() {
           </div>
 
           {blog.image && (
-            <img src={blog.image} alt={blog.title} style={{ width: '100%', borderRadius: '12px', marginBottom: '40px', maxHeight: '400px', objectFit: 'cover' }} />
+            <img
+              src={getImageUrl(blog.image)}
+              alt={blog.title}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              style={{ width: '100%', borderRadius: '12px', marginBottom: '40px', maxHeight: '400px', objectFit: 'cover' }}
+            />
           )}
 
           <div

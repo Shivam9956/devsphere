@@ -53,11 +53,24 @@ router.post('/send', protect, adminOnly, async (req, res) => {
     const emails = subscribers.map(s => s.email);
 
     const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-    });
+    const isGmail = !process.env.SMTP_HOST || process.env.SMTP_HOST === 'smtp.gmail.com';
+    const transporter = nodemailer.createTransport(
+      isGmail
+        ? {
+            service: 'gmail',
+            pool: true,
+            auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+            tls: { rejectUnauthorized: false }
+          }
+        : {
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT, 10) || 465,
+            secure: parseInt(process.env.SMTP_PORT, 10) === 465 || !process.env.SMTP_PORT,
+            pool: true,
+            auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+            tls: { rejectUnauthorized: false }
+          }
+    );
 
     // Send bulk mail using BCC to keep reader emails hidden and secure
     await transporter.sendMail({
